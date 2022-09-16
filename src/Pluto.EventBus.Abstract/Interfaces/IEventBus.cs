@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Pluto.EventBus.Abstract.Interfaces
 {
     public interface IEventBus
     {
-
+        abstract string Name {get;}
         /// <summary>
         /// 发布事件
         /// </summary>
         /// <param name="event"></param>
         void Publish(IntegrationEvent @event);
+
+
+        Task PublishAsync(IntegrationEvent @event);
 
 
         /// <summary>

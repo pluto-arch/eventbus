@@ -14,6 +14,7 @@ using Event;
 using Newtonsoft.Json;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
+using AspNetCoreTest.EventbUSS;
 
 namespace AspNetCoreTest
 {
@@ -54,12 +55,16 @@ namespace AspNetCoreTest
         {
             services.AddControllersWithViews();
 
-            services.AddDbContext<DemoDbContext>();
+            //services.AddDbContext<DemoDbContext>();
 
             services.AddTransient<UserEventHandler>();
+            services.AddTransient<DemoEventHandler>();
 
             services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
-            services.AddAliRocketMQ(Configuration);
+
+            
+            services.AddUserEventBus();
+            services.AddAdminEventBus();
 
         }
 

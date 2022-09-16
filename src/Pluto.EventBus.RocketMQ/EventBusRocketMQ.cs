@@ -37,7 +37,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
 
         public EventBusRocketMQ(
             IServiceScopeFactory serviceFactory,
-            IOptions<AliyunRocketMqOption> option,
+            AliyunRocketMqOption option,
             IMessageSerializeProvider messageSerializeProvider,
             IIntegrationEventStore eventStore=null,
             ILogger<EventBusRocketMQ> logger = null,
@@ -46,12 +46,17 @@ namespace Pluto.EventBus.AliyunRocketMQ
             _messageSerializeProvider = messageSerializeProvider??throw new InvalidOperationException("no message serializer found");
             _subsManager = subsManager??new InMemoryEventBusSubscriptionsManager();
             _service = serviceFactory;
-            _mqOption = option.Value ?? throw new ArgumentNullException(nameof(option));
+            _mqOption = option?? throw new ArgumentNullException(nameof(option));
             _logger = logger ?? NullLogger<EventBusRocketMQ>.Instance;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved; ;
             _eventStore = eventStore??NullIntegrationEventStore.Instance;
             Init();
         }
+
+
+
+        /// <inheritdoc />
+        public virtual string Name => "Default";
 
 
         private void Init()
@@ -106,6 +111,17 @@ namespace Pluto.EventBus.AliyunRocketMQ
             }
             p.PublishMessage(topicMsg);
         }
+
+
+
+        /// <inheritdoc />
+        public async Task PublishAsync(IntegrationEvent @event)
+        {
+            this.Publish(@event);
+            await Task.CompletedTask;
+        }
+
+
 
        
 
@@ -197,8 +213,8 @@ namespace Pluto.EventBus.AliyunRocketMQ
                                     continue;
                                 }
                                 _logger.LogInformation($"消息：{message.MessageTag}, 订阅者数量：{handlersForEvent.Count()}");
-                                consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
                                 await TryStoredEvent(message.MessageTag,message.Body);
+                                consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
                                 foreach (var subscriptionInfo in handlersForEvent)
                                 {
                                     if (subscriptionInfo.IsDynamic)

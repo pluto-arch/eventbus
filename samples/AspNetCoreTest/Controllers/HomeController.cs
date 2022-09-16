@@ -7,6 +7,9 @@ using AspNetCoreTest.Data;
 using Event;
 using Microsoft.EntityFrameworkCore;
 using Pluto.EventBus.Abstract.Interfaces;
+using System.Collections.Generic;
+using AspNetCoreTest.EventbUSS;
+using System.Linq;
 
 namespace AspNetCoreTest.Controllers
 {
@@ -14,14 +17,25 @@ namespace AspNetCoreTest.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private readonly IEventBus _eventBus;
+        private readonly UserEventBus _userEventBus;
 
-        private readonly DemoDbContext _context;
-        public HomeController(ILogger<HomeController> logger, IEventBus eventBus, DemoDbContext ctx)
+        private readonly AdminEventBus _adminEventBus;
+
+        ////private readonly DemoDbContext _context;
+        //public HomeController(ILogger<HomeController> logger, IEnumerable<IEventBus> eventBus)
+        //{
+        //    _logger = logger;
+        //    _userEventBus = eventBus.FirstOrDefault(x=>x.Name==nameof(UserEventBus)) as UserEventBus;
+        //    _adminEventBus = eventBus.FirstOrDefault(x=>x.Name==nameof(AdminEventBus)) as AdminEventBus;
+        //}
+
+
+        //private readonly DemoDbContext _context;
+        public HomeController(ILogger<HomeController> logger, UserEventBus aeventBus,AdminEventBus adminEvent)
         {
             _logger = logger;
-            _eventBus = eventBus;
-            _context= ctx;
+            _userEventBus = aeventBus;
+            _adminEventBus = adminEvent;
         }
 
         public IActionResult Index()
@@ -32,26 +46,28 @@ namespace AspNetCoreTest.Controllers
 
         public IActionResult Sub()
         {
-            _eventBus.Subscribe<DemoEvent, DemoEventHandler>();
-            _eventBus.Subscribe<UserEvent, UserEventHandler>();
+            _userEventBus.Subscribe<UserEvent, UserEventHandler>();
+            _adminEventBus.Subscribe<DemoEvent, DemoEventHandler>();
             return View("Index");
         }
 
         public async Task<IActionResult> Privacy()
         {
-            _eventBus.Unsubscribe<UserEvent, UserEventHandler>();
             await Task.Delay(500);
-            _eventBus.Unsubscribe<DemoEvent, DemoEventHandler>();
             return View("Index");
         }
 
 
-        public async Task<IActionResult> Update()
+        public async Task<IActionResult> User()
         {
-            _eventBus.Publish(new UserEvent
-            {
-                Code = "123123"
-            });
+            await _userEventBus.PublishAsync(new UserEvent {Code = "UserEvent"});
+            return View("Index");
+        }
+
+
+        public async Task<IActionResult> Admin()
+        {
+            await _adminEventBus.PublishAsync(new DemoEvent {Name = "DemoEvent"});
             return View("Index");
         }
 
