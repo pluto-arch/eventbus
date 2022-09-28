@@ -213,6 +213,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
                                     continue;
                                 }
                                 _logger.LogInformation($"消息：{message.MessageTag}, 订阅者数量：{handlersForEvent.Count()}");
+                                _logger.LogDebug("消息内容 ：{@message}",message);
                                 await TryStoredEvent(message.MessageTag,message.Body);
                                 consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
                                 foreach (var subscriptionInfo in handlersForEvent)
@@ -270,6 +271,17 @@ namespace Pluto.EventBus.AliyunRocketMQ
                 if (disposing)
                 {
                     // TODO: 释放托管状态(托管对象)
+                    _mQClient.Value?.Dispose();
+                    _mQClient = new Lazy<MQClient>(() =>
+                    {
+                        var accessInfo = _mqOption.AuthenticationConfiguration;
+                        _logger.LogInformation("initialize rocketmq client...");
+                        if (!string.IsNullOrEmpty(accessInfo.StsToken))
+                        {
+                            return new MQClient(accessInfo.AccessId, accessInfo.AccessKey, _mqOption.HttpEndPoint, accessInfo.StsToken);
+                        }
+                        return new MQClient(accessInfo.AccessId, accessInfo.AccessKey, _mqOption.HttpEndPoint);
+                    });
                 }
 
                 // TODO: 释放未托管的资源(未托管的对象)并重写终结器
