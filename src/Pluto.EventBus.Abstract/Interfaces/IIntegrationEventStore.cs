@@ -5,13 +5,13 @@ namespace Pluto.EventBus.Abstract.Interfaces
 {
     public interface IIntegrationEventStore
     {
-        Task SaveAsync(string eventName,string eventBody);
+        Task SaveAsync(string eventName,string eventBody, string eventBusName=null);
         
-        Task<IEnumerable<string>> GetListAllAsync();
+        Task<IEnumerable<string>> GetListAllAsync(string eventBusName = null);
         
-        Task<IEnumerable<string>> GetListAsync(string eventTypeName);
+        Task<IEnumerable<string>> GetListAsync(string eventTypeName, string eventBusName = null);
         
-        Task<IEnumerable<T>> GetListAsync<T>(string eventTypeName) where T : IntegrationEvent;
+        Task<IEnumerable<T>> GetListAsync<T>(string eventTypeName, string eventBusName = null) where T : IntegrationEvent;
         
     }
 }

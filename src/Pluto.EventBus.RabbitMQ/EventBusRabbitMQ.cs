@@ -42,11 +42,6 @@ namespace Pluto.EventBus.RabbitMQ
                 channel.QueueUnbind(queue: "_queueName",
                     exchange: "BROKER_NAME",
                     routingKey: eventName);
-
-                if (_subsManager.IsEmpty)
-                {
-                    _consumerChannel.Close();
-                }
             }
         }
 

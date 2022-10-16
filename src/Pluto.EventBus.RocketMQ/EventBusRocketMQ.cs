@@ -125,7 +125,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.AddSubscription<T, TH>(this.Name);
+            _subsManager.AddSubscription<T, TH>(this.Name?? nameof(EventBusRocketMQ));
             lock (_consumerTasklockObj)
             {
                 if (!isConsumerTaskRunning)
@@ -148,7 +148,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.RemoveSubscription<T, TH>(this.Name);
+            _subsManager.RemoveSubscription<T, TH>(this.Name?? nameof(EventBusRocketMQ));
         }
 
         /// <inheritdoc />
@@ -246,7 +246,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
         {
             try
             {
-                await _eventStore.SaveAsync(messageTag,messageBody);
+                await _eventStore.SaveAsync(messageTag,messageBody,this.Name??nameof(EventBusRocketMQ));
             }
             catch (Exception e)
             {

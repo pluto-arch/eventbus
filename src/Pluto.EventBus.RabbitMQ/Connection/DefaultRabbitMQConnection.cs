@@ -31,22 +31,30 @@ namespace Pluto.EventBus.RabbitMQ.Connection
         /// <inheritdoc />
         public bool TryConnect()
         {
-            _connection = new Lazy<IConnection>(() =>
+            try
             {
-                _logger.LogInformation("RabbitMQ Client is trying to connect");
-                return _connectionFactory.CreateConnection();
-            });
+                _connection = new Lazy<IConnection>(() =>
+                {
+                    _logger.LogInformation("RabbitMQ Client is trying to connect");
+                    return _connectionFactory.CreateConnection();
+                });
 
-            if (IsConnected)
-            {
-                _connection.Value.ConnectionShutdown += OnConnectionShutdown;
-                _connection.Value.CallbackException += OnCallbackException;
-                _connection.Value.ConnectionBlocked += OnConnectionBlocked;
-                _logger.LogInformation("RabbitMQ Client acquired a persistent connection to '{HostName}' and is subscribed to failure events", _connection.Value.Endpoint.HostName);
-                return true;
+                if (IsConnected)
+                {
+                    _connection.Value.ConnectionShutdown += OnConnectionShutdown;
+                    _connection.Value.CallbackException += OnCallbackException;
+                    _connection.Value.ConnectionBlocked += OnConnectionBlocked;
+                    _logger.LogInformation("RabbitMQ Client acquired a persistent connection to '{HostName}' and is subscribed to failure events", _connection.Value.Endpoint.HostName);
+                    return true;
+                }
+                _logger.LogCritical("FATAL ERROR: RabbitMQ connections could not be created and opened");
+                return false;
             }
-            _logger.LogCritical("FATAL ERROR: RabbitMQ connections could not be created and opened");
-            return false;
+            catch (Exception e)
+            {
+                _logger.LogError("FATAL ERROR: RabbitMQ connections could not be connected :{message}",e.Message);
+                return false;
+            }
         }
 
         /// <inheritdoc />
