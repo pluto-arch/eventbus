@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Sources;
+
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -58,14 +60,15 @@ namespace Pluto.EventBus.RabbitMQ.Connection
             return _connection.Value.CreateModel();
         }
 
-
-
-
+#if NET5_0_OR_GREATER
         public ValueTask DisposeAsync()
         {
             Dispose(true);
             return ValueTask.CompletedTask;
         }
+#endif
+
+
 
         protected virtual void Dispose(bool disposing)
         {

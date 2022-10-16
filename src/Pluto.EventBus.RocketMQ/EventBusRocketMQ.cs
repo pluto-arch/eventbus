@@ -56,7 +56,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
 
 
         /// <inheritdoc />
-        public virtual string Name => "Default";
+        public virtual string Name => "EventBusRocketMQ";
 
 
         private void Init()
@@ -79,11 +79,6 @@ namespace Pluto.EventBus.AliyunRocketMQ
             });
 
         }
-
-
-
-
-
 
 
 
@@ -130,7 +125,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.AddSubscription<T, TH>();
+            _subsManager.AddSubscription<T, TH>(this.Name);
             lock (_consumerTasklockObj)
             {
                 if (!isConsumerTaskRunning)
@@ -148,14 +143,12 @@ namespace Pluto.EventBus.AliyunRocketMQ
             }
         }
 
-
-
         /// <inheritdoc />
         public void Unsubscribe<T, TH>()
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.RemoveSubscription<T, TH>();
+            _subsManager.RemoveSubscription<T, TH>(this.Name);
         }
 
         /// <inheritdoc />
