@@ -5,7 +5,7 @@ namespace System.Reflection
 {
     public static class GenericTypeExtensions
     {
-        // <summary>
+        /// <summary>
         /// 获取泛型类型名称
         /// </summary>
         /// <param name="type"></param>

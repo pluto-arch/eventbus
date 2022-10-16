@@ -73,7 +73,7 @@ namespace AspNetCoreTest
                     InstranceId="",
                     Topic="",
                     GroupId="",
-                    HttpEndPoint="http://1226776583375087.mqrest.cn-hangzhou.aliyuncs.com",
+                    HttpEndPoint="",
                     AuthenticationConfiguration=new AliyunRocketMqOption.AuthenticationConfig
                     {
                         AccessId = "",

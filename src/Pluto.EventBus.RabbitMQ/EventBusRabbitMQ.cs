@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
@@ -61,13 +62,18 @@ namespace Pluto.EventBus.RabbitMQ
         }
 
 
-
-
-
+        /// <inheritdoc />
+        public string Name => nameof(EventBusRabbitMQ);
 
         /// <inheritdoc />
         public void Publish(IntegrationEvent @event)
         {
+        }
+
+        /// <inheritdoc />
+        public Task PublishAsync(IntegrationEvent @event)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />
