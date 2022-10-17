@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Pluto.EventBus.RabbitMQ\Pluto.EventBus.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\src\Pluto.EventBus.RocketMQ\Pluto.EventBus.AliyunRocketMQ.csproj" />
     <ProjectReference Include="..\Event\Event.csproj" />
   </ItemGroup>

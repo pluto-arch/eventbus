@@ -55,8 +55,10 @@ namespace AspNetCoreTest
             services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
 
             
-            services.AddUserEventBus();
-            services.AddAdminEventBus();
+            //services.AddUserEventBus();
+            //services.AddAdminEventBus();
+
+            services.AddRabbitMq();
 
         }
 

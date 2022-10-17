@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBus.AliyunRocketMQ;
+using Pluto.EventBus.RabbitMQ;
+using Pluto.EventBus.RabbitMQ.Connection;
+using RabbitMQ.Client;
 
 namespace AspNetCoreTest
 {
@@ -111,5 +114,42 @@ namespace AspNetCoreTest
 
             return services;
         }
+
+
+
+
+        // *************rabbitmq
+        public static IServiceCollection AddRabbitMq(this IServiceCollection services)
+        {
+            services.AddSingleton<IRabbitMQConnection>(sp =>
+            {
+                var logger = sp.GetRequiredService<ILogger<DefaultRabbitMQConnection>>();
+                var factory = new ConnectionFactory()
+                {
+                    HostName = "localhost",
+                    Port = 5672,
+                    DispatchConsumersAsync = true
+                };
+                factory.UserName = "admin";
+                factory.Password = "admin";
+                return new DefaultRabbitMQConnection(factory, logger);
+            });
+
+
+            services.AddSingleton<IEventBus, EventBusRabbitMQ>(sp =>
+            {
+                var connection = sp.GetRequiredService<IRabbitMQConnection>();
+                var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
+                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
+                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.QueueDeclare
+                {
+                    QueueName = "OrderFinished_broadcast",
+                    ExchangeType = ExchangeType.Fanout
+                });
+            });
+
+            return services;
+        }
+
     }
 }
