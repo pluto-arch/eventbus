@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
 
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Pluto.EventBus.RabbitMQ.Connection
+namespace Pluto.EventBusRabbitMQ.Connection
 {
     public class DefaultRabbitMQConnection:IRabbitMQConnection
     {

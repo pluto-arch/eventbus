@@ -2,8 +2,8 @@ using Event;
 using Newtonsoft.Json;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
-using Pluto.EventBus.RabbitMQ;
-using Pluto.EventBus.RabbitMQ.Connection;
+using Pluto.EventBusRabbitMQ;
+using Pluto.EventBusRabbitMQ.Connection;
 using RabbitMQ.Client;
 
 namespace Consumer01
@@ -75,7 +75,7 @@ namespace Consumer01
                 var connection = sp.GetRequiredService<IRabbitMQConnection>();
                 var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.RabbitNQDeclaration
+                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBusRabbitMQ.Options.RabbitNQDeclaration
                 {
                     ExchangeName = "订单广播",
                     QueueName = "票据打印",

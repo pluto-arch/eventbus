@@ -1,7 +1,7 @@
 ﻿using System;
 using RabbitMQ.Client;
 
-namespace Pluto.EventBus.RabbitMQ.Connection
+namespace Pluto.EventBusRabbitMQ.Connection
 {
 #if NET5_0_OR_GREATER
     public interface IRabbitMQConnection : IDisposable, IAsyncDisposable

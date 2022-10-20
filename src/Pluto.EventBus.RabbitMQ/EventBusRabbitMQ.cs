@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
-using Pluto.EventBus.RabbitMQ.Connection;
-using Pluto.EventBus.RabbitMQ.Options;
+using Pluto.EventBusRabbitMQ.Connection;
+using Pluto.EventBusRabbitMQ.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Pluto.EventBus.RabbitMQ
+namespace Pluto.EventBusRabbitMQ
 {
     public class EventBusRabbitMQ : IEventBus, IDisposable
     {
@@ -102,7 +102,11 @@ namespace Pluto.EventBus.RabbitMQ
                 StartBasicConsume();
             }
             var properties = _channel.CreateBasicProperties();
-            properties.DeliveryMode = 2; // persistent
+            properties.DeliveryMode = 2; // 持久化
+            if (@event.StartDeliverTime>0)
+            {
+                properties.Expiration = @event.StartDeliverTime.ToString();
+            }
             _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
             var body =Encoding.UTF8.GetBytes(_messageSerializeProvider.Serialize(@event));
             _channel.BasicPublish(
