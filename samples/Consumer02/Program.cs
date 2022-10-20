@@ -1,9 +1,11 @@
 using Event;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBus.RabbitMQ;
 using Pluto.EventBus.RabbitMQ.Connection;
+using Pluto.EventBus.RabbitMQ.Options;
 using RabbitMQ.Client;
 
 namespace Consumer02
@@ -22,6 +24,9 @@ namespace Consumer02
             builder.Services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
             builder.Services.AddRabbitMq();
             var app = builder.Build();
+
+            var eb = app.Services.GetService<IEventBus>();
+            eb?.Subscribe<UserEvent, UserEventHandler>();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -65,14 +70,15 @@ namespace Consumer02
             });
 
 
-            services.AddSingleton<IEventBus, EventBusRabbitMQ>(sp =>
+            services.AddSingleton<IEventBus, DemoEventBus>(sp =>
             {
                 var connection = sp.GetRequiredService<IRabbitMQConnection>();
-                var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
+                var logger = sp.GetRequiredService<ILogger<DemoEventBus>>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.QueueDeclare
+                return new DemoEventBus(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.RabbitNQDeclaration
                 {
-                    QueueName = "OrderFinished_voiceread",
+                    ExchangeName = "订单广播",
+                    QueueName = "订单语音播报",
                     ExchangeType = ExchangeType.Fanout
                 });
             });
@@ -80,6 +86,16 @@ namespace Consumer02
             return services;
         }
     }
+
+
+    public class DemoEventBus : EventBusRabbitMQ
+    {
+        /// <inheritdoc />
+        public DemoEventBus(IRabbitMQConnection connection, ILogger<EventBusRabbitMQ> logger, IMessageSerializeProvider messageSerializeProvider, RabbitNQDeclaration queueDeclare, IIntegrationEventStore eventStore = null, IEventBusSubscriptionsManager subsManager = null) : base(connection, logger, messageSerializeProvider, queueDeclare, eventStore, subsManager)
+        {
+        }
+    }
+
 
     public class NewtonsoftMessageSerializeProvider : IMessageSerializeProvider
     {

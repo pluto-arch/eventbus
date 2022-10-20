@@ -2,8 +2,13 @@
 
 namespace Pluto.EventBus.RabbitMQ.Options
 {
-    public class QueueDeclare
+    public class RabbitNQDeclaration
     {
+        /// <summary>
+        /// 交换机名称
+        /// </summary>
+        public string ExchangeName { get; set; }
+
         /// <summary>
         /// 队列名称
         /// </summary>

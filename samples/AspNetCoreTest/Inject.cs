@@ -141,9 +141,10 @@ namespace AspNetCoreTest
                 var connection = sp.GetRequiredService<IRabbitMQConnection>();
                 var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.QueueDeclare
+                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.RabbitNQDeclaration
                 {
-                    QueueName = "OrderFinished_broadcast",
+                    ExchangeName="订单广播",
+                    QueueName = "Default",
                     ExchangeType = ExchangeType.Fanout
                 });
             });

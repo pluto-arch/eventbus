@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Pluto.EventBus.Abstract;
 using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBus.RabbitMQ.Connection;
@@ -21,18 +22,18 @@ namespace Pluto.EventBus.RabbitMQ
         private readonly IIntegrationEventStore _eventStore;
         private readonly IEventBusSubscriptionsManager _subsManager;
 
-        private readonly QueueDeclare _queueDeclare;
+        private readonly RabbitNQDeclaration _queueDeclare;
 
         public EventBusRabbitMQ(
             IRabbitMQConnection connection, 
             ILogger<EventBusRabbitMQ> logger, 
             IMessageSerializeProvider messageSerializeProvider,
-            QueueDeclare queueDeclare,
+            RabbitNQDeclaration queueDeclare,
             IIntegrationEventStore eventStore=null,
             IEventBusSubscriptionsManager subsManager=null)
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-            _logger = logger;
+            _logger = logger?? NullLogger<EventBusRabbitMQ>.Instance;;
             _messageSerializeProvider = messageSerializeProvider;
             _queueDeclare = queueDeclare;
             _eventStore = eventStore??NullIntegrationEventStore.Instance;
@@ -49,7 +50,7 @@ namespace Pluto.EventBus.RabbitMQ
             using (var channel = _connection.CreateModel())
             {
                 channel.QueueUnbind(queue: _queueDeclare.QueueName,
-                    exchange: Name,
+                    exchange: _queueDeclare.ExchangeName,
                     routingKey: eventName);
             }
         }
@@ -65,7 +66,7 @@ namespace Pluto.EventBus.RabbitMQ
             if (!_connection.IsConnected)
                 _connection.TryConnect();
             var channel = _connection.CreateModel();
-            channel.ExchangeDeclare(exchange: Name,
+            channel.ExchangeDeclare(exchange: _queueDeclare.ExchangeName,
                 type: _queueDeclare.ExchangeType);
 
             channel.QueueDeclare(queue: _queueDeclare.QueueName,
@@ -86,7 +87,7 @@ namespace Pluto.EventBus.RabbitMQ
 
 
         /// <inheritdoc />
-        public string Name => nameof(EventBusRabbitMQ);
+        public virtual string Name => nameof(EventBusRabbitMQ);
 
         /// <inheritdoc />
         public void Publish(IntegrationEvent @event)
@@ -105,7 +106,7 @@ namespace Pluto.EventBus.RabbitMQ
             _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
             var body =Encoding.UTF8.GetBytes(_messageSerializeProvider.Serialize(@event));
             _channel.BasicPublish(
-                exchange: Name,
+                exchange: _queueDeclare.ExchangeName,
                 routingKey: eventName,
                 mandatory: true,
                 basicProperties: properties,
@@ -129,7 +130,7 @@ namespace Pluto.EventBus.RabbitMQ
             _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
             var body =Encoding.UTF8.GetBytes(_messageSerializeProvider.Serialize(@event));
             _channel.BasicPublish(
-                exchange: Name,
+                exchange: _queueDeclare.ExchangeName,
                 routingKey: eventName,
                 mandatory: true,
                 basicProperties: properties,
@@ -204,7 +205,7 @@ namespace Pluto.EventBus.RabbitMQ
                     _connection.TryConnect();
                 }
                 _channel.QueueBind(queue: _queueDeclare.QueueName,
-                    exchange: Name,
+                    exchange: _queueDeclare.ExchangeName,
                     routingKey: eventName);
             }
         }
@@ -223,7 +224,7 @@ namespace Pluto.EventBus.RabbitMQ
                     throw new InvalidOperationException($"Fake exception requested: \"{message}\"");
                 }
 
-                _logger.LogInformation("receiver message from mq :{eventName}",eventName);
+                _logger.LogDebug("receiver message from mq：{eventName}",eventName);
                 await Task.CompletedTask;
             }
             catch (Exception)

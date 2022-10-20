@@ -25,6 +25,9 @@ namespace Consumer01
 
             var app = builder.Build();
 
+            var eb = app.Services.GetService<IEventBus>();
+            eb?.Subscribe<DemoEvent, DemoEventHandler>();
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -72,9 +75,10 @@ namespace Consumer01
                 var connection = sp.GetRequiredService<IRabbitMQConnection>();
                 var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.QueueDeclare
+                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBus.RabbitMQ.Options.RabbitNQDeclaration
                 {
-                    QueueName = "OrderFinished_broadcast",
+                    ExchangeName = "订单广播",
+                    QueueName = "票据打印",
                     ExchangeType = ExchangeType.Fanout
                 });
             });

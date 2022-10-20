@@ -56,7 +56,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
 
 
         /// <inheritdoc />
-        public virtual string Name => "EventBusRocketMQ";
+        public virtual string Name => nameof(EventBusRocketMQ);
 
 
         private void Init()
