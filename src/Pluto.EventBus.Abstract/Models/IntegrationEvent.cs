@@ -30,5 +30,12 @@ namespace Pluto.EventBus.Abstract
         /// 延迟时间
         /// </summary>
         public long StartDeliverTime { get; set; }
+
+        /// <summary>
+        /// 消息路由key
+        /// 默认为事件名称
+        /// EventBus.AliyunRocketMQCore支持自定义
+        /// </summary>
+        public string RouteKey { get; set; }
     }
 }

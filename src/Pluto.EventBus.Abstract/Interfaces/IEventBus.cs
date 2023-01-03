@@ -15,7 +15,6 @@ namespace Pluto.EventBus.Abstract.Interfaces
 
         Task PublishAsync(IntegrationEvent @event);
 
-
         /// <summary>
         /// 订阅事件
         /// </summary>

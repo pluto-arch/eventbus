@@ -6,10 +6,10 @@ using Pluto.EventBus.AliyunRocketMQ;
 
 namespace AspNetCoreTest.EventbUSS
 {
-    public class UserEventBus:EventBusRocketMQ
+    public class UserEventBus:AliyunRocketEventBus
     {
         /// <inheritdoc />
-        public UserEventBus(IServiceScopeFactory serviceFactory, AliyunRocketMqOption option, IMessageSerializeProvider messageSerializeProvider, IIntegrationEventStore eventStore = null, ILogger<EventBusRocketMQ> logger = null, IEventBusSubscriptionsManager subsManager = null) : base(serviceFactory, option, messageSerializeProvider, eventStore, logger, subsManager)
+        public UserEventBus(IServiceScopeFactory serviceFactory, AliyunRocketMqOption option, IMessageSerializeProvider messageSerializeProvider, IIntegrationEventStore eventStore = null, ILogger<AliyunRocketEventBus> logger = null, IEventBusSubscriptionsManager subsManager = null) : base(serviceFactory, option, messageSerializeProvider, eventStore, logger, subsManager)
         {
         }
 

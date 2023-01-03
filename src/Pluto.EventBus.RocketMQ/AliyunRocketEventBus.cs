@@ -15,7 +15,7 @@ using Pluto.EventBus.Abstract.Interfaces;
 
 namespace Pluto.EventBus.AliyunRocketMQ
 {
-    public class EventBusRocketMQ : IEventBus, IDisposable
+    public class AliyunRocketEventBus : IEventBus, IDisposable
     {
 
         private Lazy<MQProducer> _producer;
@@ -23,7 +23,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
         private readonly IEventBusSubscriptionsManager _subsManager;
         private readonly IServiceScopeFactory _service;
         private bool disposedValue;
-        private readonly ILogger<EventBusRocketMQ> _logger;
+        private readonly ILogger<AliyunRocketEventBus> _logger;
         private readonly IMessageSerializeProvider _messageSerializeProvider;
         private readonly IIntegrationEventStore _eventStore;
         private readonly AliyunRocketMqOption _mqOption;
@@ -35,19 +35,19 @@ namespace Pluto.EventBus.AliyunRocketMQ
         #endregion
 
 
-        public EventBusRocketMQ(
+        public AliyunRocketEventBus(
             IServiceScopeFactory serviceFactory,
             AliyunRocketMqOption option,
             IMessageSerializeProvider messageSerializeProvider,
             IIntegrationEventStore eventStore=null,
-            ILogger<EventBusRocketMQ> logger = null,
+            ILogger<AliyunRocketEventBus> logger = null,
             IEventBusSubscriptionsManager subsManager=null)
         {
             _messageSerializeProvider = messageSerializeProvider??throw new InvalidOperationException("no message serializer found");
             _subsManager = subsManager??new InMemoryEventBusSubscriptionsManager();
             _service = serviceFactory;
             _mqOption = option?? throw new ArgumentNullException(nameof(option));
-            _logger = logger ?? NullLogger<EventBusRocketMQ>.Instance;
+            _logger = logger ?? NullLogger<AliyunRocketEventBus>.Instance;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved; ;
             _eventStore = eventStore??NullIntegrationEventStore.Instance;
             Init();
@@ -56,7 +56,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
 
 
         /// <inheritdoc />
-        public virtual string Name => nameof(EventBusRocketMQ);
+        public virtual string Name => nameof(AliyunRocketEventBus);
 
 
         private void Init()
@@ -97,17 +97,24 @@ namespace Pluto.EventBus.AliyunRocketMQ
         /// <inheritdoc />
         public void Publish(IntegrationEvent @event)
         {
-            var eventName = @event.GetType().Name;
+            if (@event == null)
+            {
+                _logger.WarningMessage("event is null");
+                return;
+            }
+            @event.RouteKey = @event.GetType().Name;
             var p = _producer.Value;
-            var topicMsg = new TopicMessage(_messageSerializeProvider.Serialize(@event), eventName);
+            var topicMsg = new TopicMessage(_messageSerializeProvider.Serialize(@event), @event.RouteKey)
+            {
+                Id = @event.Id
+            };
+            topicMsg.PutProperty("KEYS", @event.Id);
             if (@event.StartDeliverTime > 0)
             {
                 topicMsg.StartDeliverTime = @event.StartDeliverTime;
             }
             p.PublishMessage(topicMsg);
         }
-
-
 
         /// <inheritdoc />
         public async Task PublishAsync(IntegrationEvent @event)
@@ -125,7 +132,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.AddSubscription<T, TH>(this.Name?? nameof(EventBusRocketMQ));
+            _subsManager.AddSubscription<T, TH>(this.Name?? nameof(AliyunRocketEventBus));
             lock (_consumerTasklockObj)
             {
                 if (!isConsumerTaskRunning)
@@ -148,7 +155,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.RemoveSubscription<T, TH>(this.Name?? nameof(EventBusRocketMQ));
+            _subsManager.RemoveSubscription<T, TH>(this.Name?? nameof(AliyunRocketEventBus));
         }
 
         /// <inheritdoc />
@@ -176,9 +183,10 @@ namespace Pluto.EventBus.AliyunRocketMQ
                 var consumer = _mQClient.Value.GetConsumer(_mqOption.InstranceId, _mqOption.Topic, _mqOption.GroupId, string.Empty);
                 if (consumer == null)
                 {
-                    _logger.LogInformation($"初始化消费者失败");
+                    _logger.WarningMessage("get consumer failed");
+                    return;
                 }
-                _logger.LogInformation($"初始化消费者成功: topic:{_mqOption.Topic}  groupid:{_mqOption.GroupId}");
+                _logger.ConsumerInitialized(_mqOption.Topic, _mqOption.GroupId);
                 while (true)
                 {
                     if (tokenSource.IsCancellationRequested)
@@ -199,14 +207,13 @@ namespace Pluto.EventBus.AliyunRocketMQ
                         {
                             foreach (var message in messages)
                             {
+                                _logger.MessageConsumed(message.MessageTag, message.Body);
                                 var handlersForEvent = _subsManager.TryGetHandlersForEvent(message.MessageTag);
                                 if (handlersForEvent == null || !handlersForEvent.Any())
                                 {
-                                    _logger.LogWarning($"{message.MessageTag}没有配置任何处理程序");
+                                    _logger.WarningMessage($"{message.MessageTag}没有配置任何处理程序");
                                     continue;
                                 }
-                                _logger.LogInformation($"消息：{message.MessageTag}, 订阅者数量：{handlersForEvent.Count()}");
-                                _logger.LogDebug("消息内容 ：{@message}",message);
                                 await TryStoredEvent(message.MessageTag,message.Body);
                                 consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
                                 foreach (var subscriptionInfo in handlersForEvent)
@@ -235,7 +242,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
                     {
                         if (!(e is MessageNotExistException))
                         {
-                            _logger.LogError(e.Message);
+                            _logger.LogError(e,"consumer message has an error :{message}",e.Message);
                         }
                     }
                 }
@@ -246,7 +253,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
         {
             try
             {
-                await _eventStore.SaveAsync(messageTag,messageBody,this.Name??nameof(EventBusRocketMQ));
+                await _eventStore.SaveAsync(messageTag,messageBody,this.Name??nameof(AliyunRocketEventBus));
             }
             catch (Exception e)
             {

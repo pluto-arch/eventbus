@@ -16,7 +16,7 @@ namespace AspNetCoreTest
         {
             services.AddSingleton<UserEventBus>(sp =>
             {
-                var logger = sp.GetRequiredService<ILogger<EventBusRocketMQ>>();
+                var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
@@ -42,7 +42,7 @@ namespace AspNetCoreTest
         {
             services.AddSingleton<AdminEventBus>(sp =>
             {
-                var logger = sp.GetRequiredService<ILogger<EventBusRocketMQ>>();
+                var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
@@ -68,7 +68,7 @@ namespace AspNetCoreTest
         {
             services.AddSingleton<IEventBus,UserEventBus>(sp =>
             {
-                var logger = sp.GetRequiredService<ILogger<EventBusRocketMQ>>();
+                var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
@@ -94,7 +94,7 @@ namespace AspNetCoreTest
         {
             services.AddSingleton<IEventBus,AdminEventBus>(sp =>
             {
-                var logger = sp.GetRequiredService<ILogger<EventBusRocketMQ>>();
+                var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
                 var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
