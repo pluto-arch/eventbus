@@ -25,17 +25,32 @@ namespace Pluto.EventBus.Abstract
 
 
         public bool IsEmpty => _handlers is { Count: 0 };
-        public void Clear() => _handlers.Clear();
+
+        public void Clear(string eventBusName = null)
+        {
+            if (eventBusName==null)
+            {
+                _handlers.Clear();
+            }
+            else
+            {
+                var targetHandles = _handlers.Where(x => x.Key.StartsWith(eventBusName)).Select(x => x.Key);
+                foreach (var key in targetHandles)
+                {
+                    _handlers.Remove(key);
+                }
+            }
+        }
 
 
 
 
         /// <inheritdoc />
-        public void AddSubscription<T, TH>() 
+        public void AddSubscription<T, TH>(string eventBusName=null) 
             where T : IntegrationEvent 
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = GetEventKey<T>();
+            var eventName = $"{eventBusName}_{GetEventKey<T>()}";
 
             DoAddSubscription(typeof(TH), eventName, isDynamic: false);
 
@@ -47,40 +62,41 @@ namespace Pluto.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public void AddDynamicSubscription<TH>(string eventName) 
+        public void AddDynamicSubscription<TH>(string eventName, string eventBusName = null) 
             where TH : IDynamicIntegrationEventHandler
         {
-            DoAddSubscription(typeof(TH), eventName, isDynamic: true);
+            DoAddSubscription(typeof(TH), $"{eventBusName}_{eventName}", isDynamic: true);
         }
 
         /// <inheritdoc />
-        public void RemoveSubscription<T, TH>() 
+        public void RemoveSubscription<T, TH>(string eventBusName = null) 
             where T : IntegrationEvent 
             where TH : IIntegrationEventHandler<T>
         {
-            var handlerToRemove = FindSubscriptionToRemove<T, TH>();
-            var eventName = GetEventKey<T>();
+            var eventName = $"{eventBusName}_{GetEventKey<T>()}";
+            var handlerToRemove = FindSubscriptionToRemove<T, TH>(eventName);
             DoRemoveHandler(eventName, handlerToRemove);
         }
 
         /// <inheritdoc />
-        public void RemoveDynamicSubscription<TH>(string eventName) 
+        public void RemoveDynamicSubscription<TH>(string eventName, string eventBusName = null) 
             where TH : IDynamicIntegrationEventHandler
         {
+            eventName = $"{eventBusName}_{eventName}";
             var handlerToRemove = FindDynamicSubscriptionToRemove<TH>(eventName);
             DoRemoveHandler(eventName, handlerToRemove);
         }
 
         /// <inheritdoc />
-        public bool HasSubscriptionsForEvent<T>() 
+        public bool HasSubscriptionsForEvent<T>(string eventBusName = null) 
             where T : IntegrationEvent
         {
-            var key = GetEventKey<T>();
+            var key = $"{eventBusName}_{GetEventKey<T>()}";
             return HasSubscriptionsForEvent(key);
         }
 
         /// <inheritdoc />
-        public bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName);
+        public bool HasSubscriptionsForEvent(string eventName, string eventBusName = null) => _handlers.ContainsKey($"{eventBusName}_{eventName}");
 
         /// <inheritdoc />
         public Type GetEventTypeByName(string eventName) => _eventTypes.SingleOrDefault(t => t.Name == eventName);
@@ -89,19 +105,19 @@ namespace Pluto.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>() 
+        public IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>(string eventBusName = null) 
             where T : IntegrationEvent
         {
-            var key = GetEventKey<T>();
+            var key = $"{eventBusName}_{GetEventKey<T>()}";
             return GetHandlersForEvent(key);
         }
 
         /// <inheritdoc />
-        public IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName) => _handlers[eventName];
+        public IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName, string eventBusName = null) => _handlers[$"{eventBusName}_{eventName}"];
 
 
         /// <inheritdoc />
-        public IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string eventName) => _handlers.ContainsKey(eventName)?_handlers[eventName]:null;
+        public IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string eventName, string eventBusName = null) => _handlers.ContainsKey($"{eventBusName}_{eventName}") ?_handlers[$"{eventBusName}_{eventName}"] :null;
 
         /// <inheritdoc />
         public string GetEventKey<T>()
@@ -179,11 +195,10 @@ namespace Pluto.EventBus.Abstract
         }
 
 
-        private SubscriptionInfo FindSubscriptionToRemove<T, TH>()
+        private SubscriptionInfo FindSubscriptionToRemove<T, TH>(string eventName)
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = GetEventKey<T>();
             return DoFindSubscriptionToRemove(eventName, typeof(TH));
         }
     }

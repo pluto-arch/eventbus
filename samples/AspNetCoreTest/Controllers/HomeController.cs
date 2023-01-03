@@ -17,9 +17,17 @@ namespace AspNetCoreTest.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private readonly UserEventBus _userEventBus;
+        //private readonly UserEventBus _userEventBus;
 
-        private readonly AdminEventBus _adminEventBus;
+        //private readonly AdminEventBus _adminEventBus;
+
+        private readonly IEventBus _eventBus;
+
+        public HomeController(IEventBus eventBus, ILogger<HomeController> logger)
+        {
+            _eventBus = eventBus;
+            _logger = logger;
+        }
 
         ////private readonly DemoDbContext _context;
         //public HomeController(ILogger<HomeController> logger, IEnumerable<IEventBus> eventBus)
@@ -31,12 +39,15 @@ namespace AspNetCoreTest.Controllers
 
 
         //private readonly DemoDbContext _context;
-        public HomeController(ILogger<HomeController> logger, UserEventBus aeventBus,AdminEventBus adminEvent)
-        {
-            _logger = logger;
-            _userEventBus = aeventBus;
-            _adminEventBus = adminEvent;
-        }
+        //public HomeController(ILogger<HomeController> logger, UserEventBus aeventBus,AdminEventBus adminEvent)
+        //{
+        //    _logger = logger;
+        //    _userEventBus = aeventBus;
+        //    _adminEventBus = adminEvent;
+        //}
+
+
+
 
         public IActionResult Index()
         {
@@ -46,8 +57,8 @@ namespace AspNetCoreTest.Controllers
 
         public IActionResult Sub()
         {
-            _userEventBus.Subscribe<UserEvent, UserEventHandler>();
-            _adminEventBus.Subscribe<DemoEvent, DemoEventHandler>();
+            _eventBus.Subscribe<UserEvent, UserEventHandler>();
+            _eventBus.Subscribe<DemoEvent, DemoEventHandler>();
             return View("Index");
         }
 
@@ -60,14 +71,14 @@ namespace AspNetCoreTest.Controllers
 
         public async Task<IActionResult> User()
         {
-            await _userEventBus.PublishAsync(new UserEvent {Code = "UserEvent"});
+            await _eventBus.PublishAsync(new UserEvent {Code = "UserEvent"});
             return View("Index");
         }
 
 
         public async Task<IActionResult> Admin()
         {
-            await _adminEventBus.PublishAsync(new DemoEvent {Name = "DemoEvent"});
+            await _eventBus.PublishAsync(new DemoEvent {Name = "DemoEvent"});
             return View("Index");
         }
 

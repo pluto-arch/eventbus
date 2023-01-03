@@ -27,7 +27,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="T">事件类型</typeparam>
         /// <typeparam name="TH">事件处理程序</typeparam>
-        void AddSubscription<T, TH>()
+        void AddSubscription<T, TH>(string eventBusName = null)
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>;
 
@@ -38,7 +38,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="TH"></typeparam>
         /// <param name="eventName"></param>
-        void AddDynamicSubscription<TH>(string eventName)
+        void AddDynamicSubscription<TH>(string eventName, string eventBusName = null)
             where TH : IDynamicIntegrationEventHandler;
 
 
@@ -49,7 +49,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="T">事件类型</typeparam>
         /// <typeparam name="TH">事件处理程序</typeparam>
-        void RemoveSubscription<T, TH>()
+        void RemoveSubscription<T, TH>(string eventBusName = null)
             where TH : IIntegrationEventHandler<T>
             where T : IntegrationEvent;
 
@@ -59,7 +59,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="TH"></typeparam>
         /// <param name="eventName"></param>
-        void RemoveDynamicSubscription<TH>(string eventName)
+        void RemoveDynamicSubscription<TH>(string eventName, string eventBusName = null)
             where TH : IDynamicIntegrationEventHandler;
 
 
@@ -69,7 +69,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="T">事件类型</typeparam>
         /// <returns></returns>
-        bool HasSubscriptionsForEvent<T>() where T : IntegrationEvent;
+        bool HasSubscriptionsForEvent<T>(string eventBusName = null) where T : IntegrationEvent;
 
 
 
@@ -78,7 +78,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <returns></returns>
-        bool HasSubscriptionsForEvent(string eventName);
+        bool HasSubscriptionsForEvent(string eventName, string eventBusName = null);
 
 
 
@@ -96,13 +96,13 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="T">事件类型</typeparam>
         /// <returns></returns>
-        IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string messageMessageTag);
+        IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string messageMessageTag, string eventBusName = null);
 
 
         /// <summary>
         /// 清除订阅
         /// </summary>
-        void Clear();
+        void Clear(string eventBusName = null);
 
 
 
@@ -111,7 +111,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <typeparam name="T">事件类型</typeparam>
         /// <returns></returns>
-        IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>() where T : IntegrationEvent;
+        IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>(string eventBusName = null) where T : IntegrationEvent;
 
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Pluto.EventBus.Abstract.Interfaces
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <returns></returns>
-        IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
+        IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName, string eventBusName = null);
 
         /// <summary>
         /// 获取事件的key

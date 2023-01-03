@@ -1,20 +1,12 @@
-using AspNetCoreTest.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Pluto.EventBus.AliyunRocketMQ;
 using System;
-using Aliyun.MQ;
-using AspNetCoreTest.Data;
 using Event;
 using Newtonsoft.Json;
 using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
-using AspNetCoreTest.EventbUSS;
 
 namespace AspNetCoreTest
 {
@@ -63,8 +55,10 @@ namespace AspNetCoreTest
             services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
 
             
-            services.AddUserEventBus();
-            services.AddAdminEventBus();
+            //services.AddUserEventBus();
+            //services.AddAdminEventBus();
+
+            services.AddRabbitMq();
 
         }
 
