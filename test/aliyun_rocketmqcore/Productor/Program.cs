@@ -25,14 +25,14 @@ namespace Productor
                 var msa = sp.GetRequiredService<MessageHandlerActivator>();
                 var options = new AliyunRocketMqOption()
                 {
-                    InstranceId="MQ_INST_1226776583375087_BYV33IZv",
+                    InstranceId="",
                     Topic="t_user",
                     GroupId="GID_user",
-                    HttpEndPoint="http://1226776583375087.mqrest.cn-hangzhou.aliyuncs.com",
+                    HttpEndPoint="http://.mqrest.cn-hangzhou.aliyuncs.com",
                     AuthenticationConfiguration=new AliyunRocketMqOption.AuthenticationConfig
                     {
-                        AccessId = "LTAI5tDjbpXS5NupUsnwX7D3",
-                        AccessKey = "v11ySL868r6oOTW3rVvlmATiAvtJHO",
+                        AccessId = "",
+                        AccessKey = "",
                     }
                 };
                 return new AliyunRocketEventBusCore(options,msa,serializeProvider,null,logger);
