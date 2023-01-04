@@ -2,7 +2,7 @@
 
 namespace Pluto.EventBusRabbitMQ.Options
 {
-    public class RabbitNQDeclaration
+    public class RabbitMQDeclaration
     {
         /// <summary>
         /// 交换机名称
@@ -18,7 +18,7 @@ namespace Pluto.EventBusRabbitMQ.Options
         /// 交换机类型
         /// <see cref="ExchangeType"/>
         /// </summary>
-        public string ExchangeType { get; set; } = RabbitMQ.Client.ExchangeType.Fanout;
+        public string ExchangeType { get; set; } = RabbitMQ.Client.ExchangeType.Direct;
     }
 }
 

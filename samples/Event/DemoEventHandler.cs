@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Dncy.EventBus.Abstract.Interfaces;
 using Microsoft.Extensions.Logging;
-using Pluto.EventBus.Abstract.Interfaces;
 
 namespace Event
 {

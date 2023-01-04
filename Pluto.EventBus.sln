@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4B7B7A48-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{BD62021F-E09D-4B26-AF66-38A760029DDF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pluto.EventBus.Abstract", "src\Pluto.EventBus.Abstract\Pluto.EventBus.Abstract.csproj", "{361423DC-2910-4085-8321-AB85357BF3A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dncy.EventBus.Abstract", "src\Pluto.EventBus.Abstract\Dncy.EventBus.Abstract.csproj", "{361423DC-2910-4085-8321-AB85357BF3A4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pluto.EventBus.RabbitMQ", "src\Pluto.EventBus.RabbitMQ\Pluto.EventBus.RabbitMQ.csproj", "{E88CB45A-00D3-4A2B-92CE-3EBE7C1FE79F}"
 EndProject
@@ -19,15 +19,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore", "samples\AspNe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Event", "samples\Event\Event.csproj", "{946A73AB-7010-4663-B6F9-12467AAE7783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer01", "samples\Consumer01\Consumer01.csproj", "{633DE88B-05BE-4FAA-A152-9DB9035B1D3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consumer01", "samples\Consumer01\Consumer01.csproj", "{633DE88B-05BE-4FAA-A152-9DB9035B1D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer02", "samples\Consumer02\Consumer02.csproj", "{F1BACE5A-D177-4FF8-925F-B76CEE388ED9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consumer02", "samples\Consumer02\Consumer02.csproj", "{F1BACE5A-D177-4FF8-925F-B76CEE388ED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dncy.EventBus.AliyunRocketMQCore", "src\Dncy.EventBus.RocketMQCore\Dncy.EventBus.AliyunRocketMQCore.csproj", "{8C19BECC-763F-4428-A432-F277E05BDBED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dncy.EventBus.AliyunRocketMQCore", "src\Dncy.EventBus.RocketMQCore\Dncy.EventBus.AliyunRocketMQCore.csproj", "{8C19BECC-763F-4428-A432-F277E05BDBED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aliyun_rocketmqcore", "aliyun_rocketmqcore", "{2734610F-BBFA-47E0-856D-FF846731B849}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Productor", "test\aliyun_rocketmqcore\Productor\Productor.csproj", "{2C436C62-A086-4593-8EB3-F72088B97BAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Productor", "test\aliyun_rocketmqcore\Productor\Productor.csproj", "{2C436C62-A086-4593-8EB3-F72088B97BAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rabbitmq_exentbus", "test\rabbitmq_exentbus\rabbitmq_exentbus\rabbitmq_exentbus.csproj", "{5D34AAB1-ADF6-48B8-898A-8BF59269025C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,10 @@ Global
 		{2C436C62-A086-4593-8EB3-F72088B97BAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C436C62-A086-4593-8EB3-F72088B97BAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C436C62-A086-4593-8EB3-F72088B97BAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D34AAB1-ADF6-48B8-898A-8BF59269025C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D34AAB1-ADF6-48B8-898A-8BF59269025C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D34AAB1-ADF6-48B8-898A-8BF59269025C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D34AAB1-ADF6-48B8-898A-8BF59269025C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{8C19BECC-763F-4428-A432-F277E05BDBED} = {D19B4DDB-C8A7-43F3-AFFD-108D92DBB122}
 		{2734610F-BBFA-47E0-856D-FF846731B849} = {4B7B7A48-C92C-470E-ADA1-D63F95767566}
 		{2C436C62-A086-4593-8EB3-F72088B97BAC} = {2734610F-BBFA-47E0-856D-FF846731B849}
+		{5D34AAB1-ADF6-48B8-898A-8BF59269025C} = {4B7B7A48-C92C-470E-ADA1-D63F95767566}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D54F706C-0266-4E79-A686-3ED75A83B493}

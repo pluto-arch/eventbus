@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Pluto.EventBus.Abstract\Pluto.EventBus.Abstract.csproj" />
+    <ProjectReference Include="..\..\src\Pluto.EventBus.Abstract\Dncy.EventBus.Abstract.csproj" />
   </ItemGroup>
 
 </Project>

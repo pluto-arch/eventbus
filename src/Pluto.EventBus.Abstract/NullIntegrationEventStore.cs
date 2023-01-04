@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Pluto.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
 
-namespace Pluto.EventBus.Abstract
+namespace Dncy.EventBus.Abstract
 {
     public class NullIntegrationEventStore:IIntegrationEventStore
     {

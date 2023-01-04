@@ -1,12 +1,13 @@
-﻿using Aliyun.MQ.Model;
+﻿using System;
+using Aliyun.MQ.Model;
 using Microsoft.Extensions.Logging;
 using System.Reflection.Emit;
 #pragma warning disable SYSLIB1006
 
-namespace Dncy.EventBus.AliyunRocketMQCore;
-
+namespace Dncy.EventBus.AliyunRocketMQCore
+{
 #if NET6_0_OR_GREATER
-    public static partial class Log
+    internal static partial class Log
     {
         [LoggerMessage(
             EventId = 0,
@@ -40,9 +41,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
 
         [LoggerMessage(
             EventId = 0,
-            Level = LogLevel.Debug,
+            Level = LogLevel.Information,
             Message = "successed genetate consumer for topic: `{topic}` . group: `{groupId}`")]
-        internal static partial void ConsumerInitialized(this ILogger logger, string topic,string groupId);
+        internal static partial void ConsumerInitialized(this ILogger logger, string topic, string groupId);
 
 
 
@@ -50,13 +51,13 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
             EventId = 0,
             Level = LogLevel.Information,
             Message = "consumer message from route: `{route}`. message is : `{message}`")]
-        internal static partial void MessageConsumed(this ILogger logger, string route,string message);
+        internal static partial void MessageConsumed(this ILogger logger, string route, string message);
     }
 #else
 
-    public static class Log
+    internal static class Log
     {
-        #region log defined
+    #region log defined
         private static readonly Action<ILogger, string, Exception> _generalMessageInfo
             = LoggerMessage.Define<string>(LogLevel.Information, new EventId(0, nameof(InfoMessage)), "{message}");
 
@@ -71,8 +72,8 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
             = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(0, nameof(TaskCancelled)), "event bus {name} task has been cancelled.");
 
 
-        private static readonly Action<ILogger, Exception> _consumerInitialized
-            = LoggerMessage.Define(LogLevel.Debug, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
+        private static readonly Action<ILogger,string,string, Exception> _consumerInitialized
+            = LoggerMessage.Define<string,string>(LogLevel.Information, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
 
 
         private static readonly Action<ILogger, string, string, Exception> _messageConsumed
@@ -81,7 +82,7 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
                 new EventId(0, nameof(ConsumerInitialized)),
                 "message consumed from route: {route} . message: {body}.");
 
-        #endregion
+    #endregion
 
 
         public static void InfoMessage(this ILogger logger, string message)
@@ -107,9 +108,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
         }
 
 
-        public static void ConsumerInitialized(this ILogger logger)
+        public static void ConsumerInitialized(this ILogger logger, string topic,string groupId)
         {
-            _consumerInitialized(logger, null);
+            _consumerInitialized(logger,topic,groupId, null);
         }
 
 
@@ -119,3 +120,5 @@ namespace Dncy.EventBus.AliyunRocketMQCore;
         }
     }
 #endif
+}
+

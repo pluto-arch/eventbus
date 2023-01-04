@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Dncy.EventBus.Abstract.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Pluto.EventBus.Abstract.Interfaces
+namespace Dncy.EventBus.Abstract.Interfaces
 {
     /// <summary>
     /// 事件订阅管理器

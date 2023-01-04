@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pluto.EventBus.Abstract
+namespace Dncy.EventBus.Abstract.Models
 {
     /// <summary>
     /// 集成事件

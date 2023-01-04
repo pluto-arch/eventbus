@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Dncy.EventBus.RocketMQCore\Dncy.EventBus.AliyunRocketMQCore.csproj" />
-    <ProjectReference Include="..\..\..\src\Pluto.EventBus.Abstract\Pluto.EventBus.Abstract.csproj" />
+    <ProjectReference Include="..\..\..\src\Pluto.EventBus.Abstract\Dncy.EventBus.Abstract.csproj" />
   </ItemGroup>
 
   <ItemGroup>

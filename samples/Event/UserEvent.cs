@@ -1,4 +1,4 @@
-﻿using Pluto.EventBus.Abstract;
+﻿using Dncy.EventBus.Abstract.Models;
 
 namespace Event
 {

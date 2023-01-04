@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pluto.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
 
-namespace Pluto.EventBus.Abstract
+namespace Dncy.EventBus.Abstract
 {
     /// <summary>
     /// 内存事件管理器

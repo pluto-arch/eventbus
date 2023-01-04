@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Pluto.EventBus.Abstract.Interfaces
+namespace Dncy.EventBus.Abstract.Interfaces
 {
     /// <summary>
     /// 动态事件处理协定

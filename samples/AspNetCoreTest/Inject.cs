@@ -1,8 +1,8 @@
 ﻿using AspNetCoreTest.EventbUSS;
+using Dncy.EventBus.Abstract;
+using Dncy.EventBus.Abstract.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBus.AliyunRocketMQ;
 using Pluto.EventBusRabbitMQ;
 using Pluto.EventBusRabbitMQ.Connection;
@@ -18,7 +18,6 @@ namespace AspNetCoreTest
             {
                 var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
                 {
                     InstranceId="",
@@ -31,7 +30,7 @@ namespace AspNetCoreTest
                         AccessKey = "",
                     }
                 };
-                return new UserEventBus(serviceFactory,options,serializeProvider,NullIntegrationEventStore.Instance,logger);
+                return new UserEventBus(serviceFactory,options);
             });
 
             return services;
@@ -44,7 +43,6 @@ namespace AspNetCoreTest
             {
                 var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
                 {
                     InstranceId="",
@@ -57,7 +55,7 @@ namespace AspNetCoreTest
                         AccessKey = "",
                     }
                 };
-                return new AdminEventBus(serviceFactory,options,serializeProvider,NullIntegrationEventStore.Instance,logger);
+                return new AdminEventBus(serviceFactory,options);
             });
 
             return services;

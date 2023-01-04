@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using Dncy.EventBus.Abstract.Models;
+using System.Threading.Tasks;
 
-namespace Pluto.EventBus.Abstract.Interfaces
+namespace Dncy.EventBus.Abstract.Interfaces
 {
     /// <summary>
     /// 集成事件功能协定

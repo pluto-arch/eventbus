@@ -1,16 +1,23 @@
-﻿using Aliyun.MQ;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Aliyun.MQ;
 using Aliyun.MQ.Model;
 using Aliyun.MQ.Model.Exp;
+using Dncy.EventBus.Abstract.EventActivator;
 using Dncy.EventBus.AliyunRocketMQCore.Options;
-using Dncy.MQMessageActivator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
 
 namespace Dncy.EventBus.AliyunRocketMQCore
 {
-    public class AliyunRocketEventBusCore : IEventBus, IDisposable
+    public class AliyunRocketEventBusCore : IDisposable
     {
 
         private readonly Lazy<MQProducer> _producer;
@@ -20,19 +27,21 @@ namespace Dncy.EventBus.AliyunRocketMQCore
         private readonly ILogger<AliyunRocketEventBusCore> _logger;
         private readonly IIntegrationEventStore _eventStore;
         private readonly AliyunRocketMqOption _mqOption;
-        private readonly IMessageSerializeProvider _messageSerializeProvider;
-        private readonly MessageHandlerActivator messageHandlerActivator;
+        private readonly IntegrationEventHandlerActivator _ieha;
+
+        static JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
 
         public AliyunRocketEventBusCore(
             AliyunRocketMqOption option,
-            MessageHandlerActivator messageHandlerActivator,
-            IMessageSerializeProvider messageSerializeProvider,
+            IntegrationEventHandlerActivator messageHandlerActivator,
             IIntegrationEventStore eventStore = null,
             ILogger<AliyunRocketEventBusCore> logger = null)
         {
             _mqOption = option ?? throw new ArgumentNullException(nameof(option));
-            this.messageHandlerActivator = messageHandlerActivator;
-            _messageSerializeProvider = messageSerializeProvider;
+            _ieha = messageHandlerActivator;
             _logger = logger ?? NullLogger<AliyunRocketEventBusCore>.Instance;
             _eventStore = eventStore ?? NullIntegrationEventStore.Instance;
 
@@ -53,16 +62,11 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                 _logger.DebugMessage("initialize rocketmq producer...");
                 return _mQClient.Value.GetProducer(_mqOption.InstranceId, _mqOption.Topic);
             });
-
-            StartBasicConsume(null);
         }
 
 
-
-        /// <inheritdoc />
         public virtual string Name => nameof(AliyunRocketEventBusCore);
 
-        /// <inheritdoc />
         public void Publish(IntegrationEvent @event)
         {
             if (@event == null)
@@ -71,8 +75,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                 return;
             }
             @event.RouteKey ??= @event.GetType().Name;
+            @event.RouteKey = @event.RouteKey.StartsWith("/")?@event.RouteKey:$"/{@event.RouteKey}";
             var p = _producer.Value;
-            var messageBody = _messageSerializeProvider.Serialize(@event);
+            var messageBody = JsonSerializer.Serialize<object>(@event,options);
             var topicMsg = new TopicMessage(messageBody, @event.RouteKey)
             {
                 Id = @event.Id
@@ -85,55 +90,13 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             p.PublishMessage(topicMsg);
         }
 
-
-
-        /// <inheritdoc />
         public async Task PublishAsync(IntegrationEvent @event)
         {
             Publish(@event);
             await Task.CompletedTask;
         }
 
-
-        #region Obsolete
-        /// <inheritdoc />
-        [Obsolete]
-        public void Subscribe<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
-        {
-        }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public void Unsubscribe<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
-        {
-
-        }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public void SubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-
-        }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public void UnsubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-
-        }
-        #endregion
-
-
-
-
-        private Task StartBasicConsume(CancellationTokenSource tokenSource)
+        public Task StartBasicConsume(CancellationToken tokenSource=default)
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -144,12 +107,11 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                     return;
                 }
                 _logger.ConsumerInitialized(_mqOption.Topic, _mqOption.GroupId);
-                for (;;)
+                while(true)
                 {
                     if (tokenSource is { IsCancellationRequested: true })
                     {
-                        tokenSource.Cancel();
-                        tokenSource.Token.ThrowIfCancellationRequested();
+                        tokenSource.ThrowIfCancellationRequested();
                     }
 
                     try
@@ -159,25 +121,46 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                         {
                             continue;
                         }
-                        
+
                         foreach (var message in messages)
                         {
                             _logger.MessageConsumed(message.MessageTag, message.Body);
-                            consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
+                            consumer.AckMessage(new List<string>() {message.ReceiptHandle});
                             await TryStoredEvent(message.MessageTag, message.Body);
-                            await messageHandlerActivator.ProcessRequestAsync($"/{message.MessageTag}", message.Body);
+                            await _ieha.ProcessRequestAsync(message.MessageTag, message.Body);
                         }
                     }
                     catch (Exception e)
                     {
-                        if (!( e is MessageNotExistException ))
+                        if (!(e is MessageNotExistException))
                         {
-                            _logger.LogError(e,"consumer message has an error :{message}",e.Message);
+                            _logger.LogError(e, "consumer message has an error :{message}", e.Message);
                         }
                     }
                 }
-            }, tokenSource?.Token ?? default);
+            }, tokenSource);
         }
+
+        public List<SubscribeDescriptorItemModel> Subscribes => _ieha.SubscribeList();
+
+
+        public void DisableSubscribe(params string[] ids)
+        {
+            foreach (var item in ids)
+            {
+                _ieha.DisableEventHandler(item);
+            }
+        }
+
+
+        public void EnableSubscribe(params string[] ids)
+        {
+            foreach (var item in ids)
+            {
+                _ieha.EnableEventHandler(item);
+            }
+        }
+
 
         private async Task TryStoredEvent(string messageTag, string messageBody)
         {
@@ -235,7 +218,5 @@ namespace Dncy.EventBus.AliyunRocketMQCore
         }
 
         #endregion
-
-
     }
 }

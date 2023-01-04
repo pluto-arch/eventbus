@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Dncy.EventBus.Abstract.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Pluto.EventBus.Abstract.Interfaces
+namespace Dncy.EventBus.Abstract.Interfaces
 {
     public interface IIntegrationEventStore
     {

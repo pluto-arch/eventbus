@@ -42,7 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Pluto.EventBus.Abstract\Pluto.EventBus.Abstract.csproj" />
+	  <ProjectReference Include="..\Pluto.EventBus.Abstract\Dncy.EventBus.Abstract.csproj" />
 	</ItemGroup>
 
 

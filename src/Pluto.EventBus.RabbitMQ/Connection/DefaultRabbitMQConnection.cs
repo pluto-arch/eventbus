@@ -1,18 +1,18 @@
 ﻿using System;
-using System.IO;
+using System.Security.Authentication;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
+using Pluto.EventBusRabbitMQ.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Pluto.EventBusRabbitMQ.Connection
 {
-    public class DefaultRabbitMQConnection:IRabbitMQConnection
+    public class DefaultRabbitMQConnection : IRabbitMQConnection
     {
         private readonly IConnectionFactory _connectionFactory;
         private readonly ILogger<DefaultRabbitMQConnection> _logger;
-        public Lazy<IConnection> _connection;
+        public IConnection _connection;
 
         bool _disposed;
 
@@ -20,30 +20,24 @@ namespace Pluto.EventBusRabbitMQ.Connection
         {
             _connectionFactory = connectionFactory;
             _logger = logger;
-            TryConnect();
         }
 
 
         /// <inheritdoc />
-        public bool IsConnected => _connection.Value is {IsOpen: true} && !_disposed;
+        public bool IsConnected => _connection is { IsOpen: true } && !_disposed;
 
         /// <inheritdoc />
         public bool TryConnect()
         {
             try
             {
-                _connection = new Lazy<IConnection>(() =>
-                {
-                    _logger.LogInformation("RabbitMQ Client is trying to connect");
-                    return _connectionFactory.CreateConnection();
-                });
-
+                _connection = _connectionFactory.CreateConnection();
                 if (IsConnected)
                 {
-                    _connection.Value.ConnectionShutdown += OnConnectionShutdown;
-                    _connection.Value.CallbackException += OnCallbackException;
-                    _connection.Value.ConnectionBlocked += OnConnectionBlocked;
-                    _logger.LogInformation("RabbitMQ Client acquired a persistent connection to '{HostName}' and is subscribed to failure events", _connection.Value.Endpoint.HostName);
+                    _connection.ConnectionShutdown += OnConnectionShutdown;
+                    _connection.CallbackException += OnCallbackException;
+                    _connection.ConnectionBlocked += OnConnectionBlocked;
+                    _logger.LogInformation("RabbitMQ Client acquired a persistent connection to '{HostName}' and is subscribed to failure events", _connection.Endpoint.HostName);
                     return true;
                 }
                 _logger.LogCritical("FATAL ERROR: RabbitMQ connections could not be created and opened");
@@ -51,7 +45,7 @@ namespace Pluto.EventBusRabbitMQ.Connection
             }
             catch (Exception e)
             {
-                _logger.LogError("FATAL ERROR: RabbitMQ connections could not be connected :{message}",e.Message);
+                _logger.LogError("FATAL ERROR: RabbitMQ connections could not be connected :{message}", e.Message);
                 return false;
             }
         }
@@ -64,7 +58,7 @@ namespace Pluto.EventBusRabbitMQ.Connection
                 throw new InvalidOperationException("No RabbitMQ connections are available to perform this action");
             }
 
-            return _connection.Value.CreateModel();
+            return _connection.CreateModel();
         }
 
 #if NET5_0_OR_GREATER
@@ -84,10 +78,10 @@ namespace Pluto.EventBusRabbitMQ.Connection
                 if (disposing)
                 {
                     // TODO: 释放托管状态(托管对象)
-                    _connection.Value.ConnectionShutdown -= OnConnectionShutdown;
-                    _connection.Value.CallbackException -= OnCallbackException;
-                    _connection.Value.ConnectionBlocked -= OnConnectionBlocked;
-                    _connection.Value.Dispose();
+                    _connection.ConnectionShutdown -= OnConnectionShutdown;
+                    _connection.CallbackException -= OnCallbackException;
+                    _connection.ConnectionBlocked -= OnConnectionBlocked;
+                    _connection.Dispose();
                 }
 
                 // TODO: 释放未托管的资源(未托管的对象)并重写终结器

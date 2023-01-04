@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
+using System.Text.Json;
+using Dncy.EventBus.Abstract;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
 
 namespace Pluto.EventBus.AliyunRocketMQ
 {
@@ -24,7 +25,6 @@ namespace Pluto.EventBus.AliyunRocketMQ
         private readonly IServiceScopeFactory _service;
         private bool disposedValue;
         private readonly ILogger<AliyunRocketEventBus> _logger;
-        private readonly IMessageSerializeProvider _messageSerializeProvider;
         private readonly IIntegrationEventStore _eventStore;
         private readonly AliyunRocketMqOption _mqOption;
 
@@ -38,12 +38,10 @@ namespace Pluto.EventBus.AliyunRocketMQ
         public AliyunRocketEventBus(
             IServiceScopeFactory serviceFactory,
             AliyunRocketMqOption option,
-            IMessageSerializeProvider messageSerializeProvider,
             IIntegrationEventStore eventStore=null,
             ILogger<AliyunRocketEventBus> logger = null,
             IEventBusSubscriptionsManager subsManager=null)
         {
-            _messageSerializeProvider = messageSerializeProvider??throw new InvalidOperationException("no message serializer found");
             _subsManager = subsManager??new InMemoryEventBusSubscriptionsManager();
             _service = serviceFactory;
             _mqOption = option?? throw new ArgumentNullException(nameof(option));
@@ -104,7 +102,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             }
             @event.RouteKey = @event.GetType().Name;
             var p = _producer.Value;
-            var topicMsg = new TopicMessage(_messageSerializeProvider.Serialize(@event), @event.RouteKey)
+            var topicMsg = new TopicMessage(JsonSerializer.Serialize(@event), @event.RouteKey)
             {
                 Id = @event.Id
             };
@@ -222,7 +220,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
                                     {
                                         var handle = scope.ServiceProvider.GetRequiredService(subscriptionInfo.HandlerType) as IDynamicIntegrationEventHandler;
                                         if (handle == null) continue;
-                                        var obj2 = _messageSerializeProvider.Deserialize<dynamic>(message.Body);
+                                        var obj2 = JsonSerializer.Deserialize<dynamic>(message.Body);
                                         await handle.Handle(obj2);
                                     }
                                     else
@@ -231,7 +229,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
                                         if (handle == null) continue;
                                         var eventType = _subsManager.GetEventTypeByName(message.MessageTag);
                                         var type = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                                        var obj2 = _messageSerializeProvider.Deserialize(message.Body, eventType);
+                                        var obj2 = JsonSerializer.Deserialize(message.Body, eventType);
                                         await (Task)type.GetMethod("Handle").Invoke(handle, new object[1] { obj2 });
                                     }
                                 }

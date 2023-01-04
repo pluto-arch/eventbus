@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Pluto.EventBus.Abstract
+namespace Dncy.EventBus.Abstract.Models
 {
     /// <summary>
     /// 订阅者信息模型
