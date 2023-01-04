@@ -1,11 +1,8 @@
+using Dncy.EventBus.Abstract.Interfaces;
 using Event;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBusRabbitMQ;
 using Pluto.EventBusRabbitMQ.Connection;
-using Pluto.EventBusRabbitMQ.Options;
 using RabbitMQ.Client;
 
 namespace Consumer02
@@ -21,7 +18,6 @@ namespace Consumer02
 
             builder.Services.AddTransient<UserEventHandler>();
             builder.Services.AddTransient<DemoEventHandler>();
-            builder.Services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
             builder.Services.AddRabbitMq();
             var app = builder.Build();
 
@@ -70,51 +66,9 @@ namespace Consumer02
             });
 
 
-            services.AddSingleton<IEventBus, DemoEventBus>(sp =>
-            {
-                var connection = sp.GetRequiredService<IRabbitMQConnection>();
-                var logger = sp.GetRequiredService<ILogger<DemoEventBus>>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new DemoEventBus(connection,logger,serializeProvider,new Pluto.EventBusRabbitMQ.Options.RabbitNQDeclaration
-                {
-                    ExchangeName = "订单广播",
-                    QueueName = "订单语音播报",
-                    ExchangeType = ExchangeType.Fanout
-                });
-            });
-
             return services;
         }
     }
 
 
-    public class DemoEventBus : EventBusRabbitMQ
-    {
-        /// <inheritdoc />
-        public DemoEventBus(IRabbitMQConnection connection, ILogger<EventBusRabbitMQ> logger, IMessageSerializeProvider messageSerializeProvider, RabbitNQDeclaration queueDeclare, IIntegrationEventStore eventStore = null, IEventBusSubscriptionsManager subsManager = null) : base(connection, logger, messageSerializeProvider, queueDeclare, eventStore, subsManager)
-        {
-        }
-    }
-
-
-    public class NewtonsoftMessageSerializeProvider : IMessageSerializeProvider
-    {
-        /// <inheritdoc />
-        public string Serialize(object obj)
-        {
-            return JsonConvert.SerializeObject(obj);
-        }
-
-        /// <inheritdoc />
-        public T Deserialize<T>(string objStr)
-        {
-            return JsonConvert.DeserializeObject<T>(objStr);
-        }
-
-        /// <inheritdoc />
-        public object Deserialize(string objStr, Type type)
-        {
-            return JsonConvert.DeserializeObject(objStr, type);
-        }
-    }
 }

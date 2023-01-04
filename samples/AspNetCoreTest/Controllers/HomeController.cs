@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using AspNetCoreTest.Data;
 using Event;
 using Microsoft.EntityFrameworkCore;
-using Pluto.EventBus.Abstract.Interfaces;
 using System.Collections.Generic;
 using AspNetCoreTest.EventbUSS;
 using System.Linq;
+using Dncy.EventBus.Abstract.Interfaces;
 
 namespace AspNetCoreTest.Controllers
 {

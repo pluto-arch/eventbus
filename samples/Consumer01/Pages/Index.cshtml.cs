@@ -1,7 +1,7 @@
-﻿using Event;
+﻿using Dncy.EventBus.Abstract.Interfaces;
+using Event;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Pluto.EventBus.Abstract.Interfaces;
 
 namespace Consumer01.Pages
 {

@@ -6,32 +6,9 @@ using Microsoft.Extensions.Hosting;
 using System;
 using Event;
 using Newtonsoft.Json;
-using Pluto.EventBus.Abstract;
 
 namespace AspNetCoreTest
 {
-
-    public class NewtonsoftMessageSerializeProvider : IMessageSerializeProvider
-    {
-        /// <inheritdoc />
-        public string Serialize(object obj)
-        {
-            return JsonConvert.SerializeObject(obj);
-        }
-
-        /// <inheritdoc />
-        public T Deserialize<T>(string objStr)
-        {
-            return JsonConvert.DeserializeObject<T>(objStr);
-        }
-
-        /// <inheritdoc />
-        public object Deserialize(string objStr, Type type)
-        {
-            return JsonConvert.DeserializeObject(objStr, type);
-        }
-    }
-
 
     public class Startup
     {
@@ -51,8 +28,6 @@ namespace AspNetCoreTest
 
             services.AddTransient<UserEventHandler>();
             services.AddTransient<DemoEventHandler>();
-
-            services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
 
             
             //services.AddUserEventBus();

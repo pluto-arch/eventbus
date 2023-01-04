@@ -68,7 +68,6 @@ namespace AspNetCoreTest
             {
                 var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
                 {
                     InstranceId="",
@@ -81,7 +80,7 @@ namespace AspNetCoreTest
                         AccessKey = "",
                     }
                 };
-                return new UserEventBus(serviceFactory,options,serializeProvider,NullIntegrationEventStore.Instance,logger);
+                return new UserEventBus(serviceFactory,options,NullIntegrationEventStore.Instance,logger);
             });
 
             return services;
@@ -94,7 +93,6 @@ namespace AspNetCoreTest
             {
                 var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBus>>();
                 var serviceFactory = sp.GetRequiredService<IServiceScopeFactory>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
                 var options = new AliyunRocketMqOption()
                 {
                     InstranceId="",
@@ -107,7 +105,7 @@ namespace AspNetCoreTest
                         AccessKey = "",
                     }
                 };
-                return new AdminEventBus(serviceFactory,options,serializeProvider,NullIntegrationEventStore.Instance,logger);
+                return new AdminEventBus(serviceFactory,options,NullIntegrationEventStore.Instance,logger);
             });
 
             return services;
@@ -131,20 +129,6 @@ namespace AspNetCoreTest
                 factory.UserName = "admin";
                 factory.Password = "admin";
                 return new DefaultRabbitMQConnection(factory, logger);
-            });
-
-
-            services.AddSingleton<IEventBus, EventBusRabbitMQ>(sp =>
-            {
-                var connection = sp.GetRequiredService<IRabbitMQConnection>();
-                var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBusRabbitMQ.Options.RabbitNQDeclaration
-                {
-                    ExchangeName="订单广播",
-                    QueueName = "Default",
-                    ExchangeType = ExchangeType.Fanout
-                });
             });
 
             return services;

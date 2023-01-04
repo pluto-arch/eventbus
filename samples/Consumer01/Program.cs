@@ -1,7 +1,6 @@
+using Dncy.EventBus.Abstract.Interfaces;
 using Event;
 using Newtonsoft.Json;
-using Pluto.EventBus.Abstract;
-using Pluto.EventBus.Abstract.Interfaces;
 using Pluto.EventBusRabbitMQ;
 using Pluto.EventBusRabbitMQ.Connection;
 using RabbitMQ.Client;
@@ -19,7 +18,6 @@ namespace Consumer01
 
             builder.Services.AddTransient<UserEventHandler>();
             builder.Services.AddTransient<DemoEventHandler>();
-            builder.Services.AddSingleton<IMessageSerializeProvider, NewtonsoftMessageSerializeProvider>();
 
             builder.Services.AddRabbitMq();
 
@@ -69,43 +67,8 @@ namespace Consumer01
                 return new DefaultRabbitMQConnection(factory, logger);
             });
 
-
-            services.AddSingleton<IEventBus, EventBusRabbitMQ>(sp =>
-            {
-                var connection = sp.GetRequiredService<IRabbitMQConnection>();
-                var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
-                var serializeProvider = sp.GetRequiredService<IMessageSerializeProvider>();
-                return new EventBusRabbitMQ(connection,logger,serializeProvider,new Pluto.EventBusRabbitMQ.Options.RabbitNQDeclaration
-                {
-                    ExchangeName = "订单广播",
-                    QueueName = "票据打印",
-                    ExchangeType = ExchangeType.Fanout
-                });
-            });
-
             return services;
         }
     }
 
-
-    public class NewtonsoftMessageSerializeProvider : IMessageSerializeProvider
-    {
-        /// <inheritdoc />
-        public string Serialize(object obj)
-        {
-            return JsonConvert.SerializeObject(obj);
-        }
-
-        /// <inheritdoc />
-        public T Deserialize<T>(string objStr)
-        {
-            return JsonConvert.DeserializeObject<T>(objStr);
-        }
-
-        /// <inheritdoc />
-        public object Deserialize(string objStr, Type type)
-        {
-            return JsonConvert.DeserializeObject(objStr, type);
-        }
-    }
 }
