@@ -69,17 +69,13 @@ namespace Pluto.EventBusRabbitMQ
             }
             _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
 
-            using (var channel = _connection.CreateModel())
-            {
-                channel.ExchangeDeclare(exchange: _queueDeclare.ExchangeName, type: _queueDeclare.ExchangeType);
-                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event,options));
-                channel.BasicPublish(
-                    exchange: _queueDeclare.ExchangeName,
-                    routingKey: @event.RouteKey,
-                    mandatory: true,
-                    basicProperties: properties,
-                    body: body);
-            }
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event,options));
+            _channel.BasicPublish(
+                exchange: _queueDeclare.ExchangeName,
+                routingKey: @event.RouteKey,
+                mandatory: true,
+                basicProperties: properties,
+                body: body);
         }
 
         public Task PublishAsync(IntegrationEvent @event)
