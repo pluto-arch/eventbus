@@ -35,6 +35,7 @@ namespace Pluto.EventBusRabbitMQ
         private readonly RabbitMQDeclaration _queueDeclare;
 
         private IModel _channel;
+        private IModel _publishChannel;
         private bool disposedValue;
 
         public EventBusRabbitMQ(
@@ -69,8 +70,10 @@ namespace Pluto.EventBusRabbitMQ
             }
             _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
 
+            _publishChannel ??= CreatePublishChannel();
+
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event,options));
-            _channel.BasicPublish(
+            _publishChannel.BasicPublish(
                 exchange: _queueDeclare.ExchangeName,
                 routingKey: @event.RouteKey,
                 mandatory: true,
@@ -173,6 +176,33 @@ namespace Pluto.EventBusRabbitMQ
         }
 
 
+        private IModel CreatePublishChannel()
+        {
+            if (!_connection.IsConnected)
+                _connection.TryConnect();
+            var channel = _connection.CreateModel();
+            channel.ExchangeDeclare(
+                exchange: _queueDeclare.ExchangeName,
+                type: _queueDeclare.ExchangeType);
+
+            channel.CallbackException += (sender, ea) =>
+            {
+                _logger.LogWarning(ea.Exception, "publish channel has an exception details: {detail}", ea.Detail);
+                _publishChannel?.Dispose();
+                _publishChannel = CreateChannel();
+            };
+
+            channel.ModelShutdown += (sender, ea) =>
+            {
+                _logger.LogWarning("publish channel is Shutdown with code {code}. message: {message}", ea.ReplyCode, ea.ReplyText);
+                _publishChannel?.Dispose();
+                _publishChannel = CreateChannel();
+            };
+
+            return channel;
+        }
+
+
 
         private async Task Consumer_Received(object sender, BasicDeliverEventArgs @event)
         {
@@ -215,6 +245,7 @@ namespace Pluto.EventBusRabbitMQ
                 {
                     // TODO: 释放托管状态(托管对象)
                     _channel?.Dispose();
+                    _publishChannel?.Dispose();
                 }
 
                 // TODO: 释放未托管的资源(未托管的对象)并重写终结器
