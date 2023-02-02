@@ -14,6 +14,10 @@ namespace Sample
         static async Task Main(string[] args)
         {
             var services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConsole();
+            });
 
             // 注入消息激活器，会将所有的IntegrationEventHandler中使用了Subscribe标记的方法注册进总线
             services.AddSingleton<IntegrationEventHandlerActivator>();

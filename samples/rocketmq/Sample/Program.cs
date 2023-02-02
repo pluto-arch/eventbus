@@ -14,6 +14,10 @@ namespace Sample
         static async Task Main(string[] args)
         {
             var services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConsole();
+            });
 
             // 1、注入事件处理程序
             services.AddTransient<UserEventHnadler>();
