@@ -1,20 +1,32 @@
 ﻿using Aliyun.MQ;
 using Aliyun.MQ.Model;
 using Aliyun.MQ.Model.Exp;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text.Json;
 using Dncy.EventBus.Abstract;
 using Dncy.EventBus.Abstract.Interfaces;
 using Dncy.EventBus.Abstract.Models;
+/* 项目“Dncy.EventBus.AliyunRocketMQ (netcoreapp3.1)”的未合并的更改
+在此之前:
+using Dncy.EventBus.AliyunRocketMQ.Options;
+在此之后:
+using Dncy.EventBus.AliyunRocketMQ.Options;
+using Pluto;
+using Pluto.EventBus;
+using Pluto.EventBus.AliyunRocketMQ;
+using Dncy.EventBus.AliyunRocketMQ;
+*/
+using Dncy.EventBus.AliyunRocketMQ.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Pluto.EventBus.AliyunRocketMQ;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Pluto.EventBus.AliyunRocketMQ
+namespace Dncy.EventBus.AliyunRocketMQ
 {
     public class AliyunRocketEventBus : IEventBus, IDisposable
     {
@@ -38,16 +50,16 @@ namespace Pluto.EventBus.AliyunRocketMQ
         public AliyunRocketEventBus(
             IServiceScopeFactory serviceFactory,
             AliyunRocketMqOption option,
-            IIntegrationEventStore eventStore=null,
+            IIntegrationEventStore eventStore = null,
             ILogger<AliyunRocketEventBus> logger = null,
-            IEventBusSubscriptionsManager subsManager=null)
+            IEventBusSubscriptionsManager subsManager = null)
         {
-            _subsManager = subsManager??new InMemoryEventBusSubscriptionsManager();
+            _subsManager = subsManager ?? new InMemoryEventBusSubscriptionsManager();
             _service = serviceFactory;
-            _mqOption = option?? throw new ArgumentNullException(nameof(option));
+            _mqOption = option ?? throw new ArgumentNullException(nameof(option));
             _logger = logger ?? NullLogger<AliyunRocketEventBus>.Instance;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved; ;
-            _eventStore = eventStore??NullIntegrationEventStore.Instance;
+            _eventStore = eventStore ?? NullIntegrationEventStore.Instance;
             Init();
         }
 
@@ -84,7 +96,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
         {
             if (_subsManager.IsEmpty)
             {
-                if (cancellationTokenSource!=null && cancellationTokenSource.Token.CanBeCanceled)
+                if (cancellationTokenSource != null && cancellationTokenSource.Token.CanBeCanceled)
                 {
                     cancellationTokenSource.Cancel();
                 }
@@ -117,20 +129,20 @@ namespace Pluto.EventBus.AliyunRocketMQ
         /// <inheritdoc />
         public async Task PublishAsync(IntegrationEvent @event)
         {
-            this.Publish(@event);
+            Publish(@event);
             await Task.CompletedTask;
         }
 
 
 
-       
+
 
         /// <inheritdoc />
         public void Subscribe<T, TH>()
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.AddSubscription<T, TH>(this.Name?? nameof(AliyunRocketEventBus));
+            _subsManager.AddSubscription<T, TH>(Name ?? nameof(AliyunRocketEventBus));
             lock (_consumerTasklockObj)
             {
                 if (!isConsumerTaskRunning)
@@ -153,7 +165,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            _subsManager.RemoveSubscription<T, TH>(this.Name?? nameof(AliyunRocketEventBus));
+            _subsManager.RemoveSubscription<T, TH>(Name ?? nameof(AliyunRocketEventBus));
         }
 
         /// <inheritdoc />
@@ -201,7 +213,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
                             continue;
                         }
 
-                        using (var scope=_service.CreateScope())
+                        using (var scope = _service.CreateScope())
                         {
                             foreach (var message in messages)
                             {
@@ -212,8 +224,8 @@ namespace Pluto.EventBus.AliyunRocketMQ
                                     _logger.WarningMessage($"{message.MessageTag}没有配置任何处理程序");
                                     continue;
                                 }
-                                await TryStoredEvent(message.MessageTag,message.Body);
-                                consumer.AckMessage(new List<string>(){ message.ReceiptHandle });
+                                await TryStoredEvent(message.MessageTag, message.Body);
+                                consumer.AckMessage(new List<string>() { message.ReceiptHandle });
                                 foreach (var subscriptionInfo in handlersForEvent)
                                 {
                                     if (subscriptionInfo.IsDynamic)
@@ -238,9 +250,9 @@ namespace Pluto.EventBus.AliyunRocketMQ
                     }
                     catch (Exception e)
                     {
-                        if (!(e is MessageNotExistException))
+                        if (!( e is MessageNotExistException ))
                         {
-                            _logger.LogError(e,"consumer message has an error :{message}",e.Message);
+                            _logger.LogError(e, "consumer message has an error :{message}", e.Message);
                         }
                     }
                 }
@@ -251,11 +263,11 @@ namespace Pluto.EventBus.AliyunRocketMQ
         {
             try
             {
-                await _eventStore.SaveAsync(messageTag,messageBody,this.Name??nameof(AliyunRocketEventBus));
+                await _eventStore.SaveAsync(messageTag, messageBody, Name ?? nameof(AliyunRocketEventBus));
             }
             catch (Exception e)
             {
-                _logger.LogError(e,$"storage integration event has an error：{e.Message}");
+                _logger.LogError(e, $"storage integration event has an error：{e.Message}");
             }
         }
 

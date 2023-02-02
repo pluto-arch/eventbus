@@ -1,12 +1,12 @@
-﻿using System;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
+using System;
 
-namespace Pluto.EventBusRabbitMQ.Connection
+namespace Dncy.EventBus.RabbitMQ.Connection
 {
 #if NET5_0_OR_GREATER
     public interface IRabbitMQConnection : IDisposable, IAsyncDisposable
 #else
-    public interface IRabbitMQConnection:IDisposable
+    public interface IRabbitMQConnection : IDisposable
 #endif
     {
         bool IsConnected { get; }

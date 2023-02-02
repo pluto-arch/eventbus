@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 #pragma warning disable CS8618
 
 namespace Dncy.EventBus.AliyunRocketMQCore.Options

@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using Dncy.EventBus.Abstract.Extensions;
 using Microsoft.AspNetCore.Routing;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using Dncy.EventBus.Abstract.Extensions;
-using System.Threading;
-using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dncy.EventBus.Abstract.EventActivator
 {
@@ -42,9 +41,9 @@ namespace Dncy.EventBus.Abstract.EventActivator
         {
             using (var sc = _scopeFactory.CreateScope())
             {
-                var logger = sc.ServiceProvider.GetRequiredService<ILogger<IntegrationEventHandlerActivator>>();
+                var logger = sc.ServiceProvider.GetService<ILogger<IntegrationEventHandlerActivator>>()??NullLogger<IntegrationEventHandlerActivator>.Instance;
                 logger.LogDebug("receive message：{msg}. on route：{route}。", message, route);
-                foreach (SubscribeDescriptor subscribeDescriptor in _lazySubscribes.Value.Where(x => !disabled.Contains(x.Id)).OrderBy(x=>x.Order))
+                foreach (SubscribeDescriptor subscribeDescriptor in _lazySubscribes.Value.Where(x => !disabled.Contains(x.Id)).OrderBy(x => x.Order))
                 {
 #if NETCOREAPP3_1
                     RouteValueDictionary matchedRouteValues = new RouteValueDictionary();
@@ -112,7 +111,7 @@ namespace Dncy.EventBus.Abstract.EventActivator
                     RouteTemplate = item.AttributeRouteInfo.RouteTemplate,
                     Order = item.Order,
                     MethodInfo = $"{item.MethodInfo.DeclaringType.Namespace}{item.MethodInfo.Name}",
-                    Parames = item.Parameters!=null?JsonSerializer.Serialize(item.Parameters.Select(x=>x.Name)):string.Empty,
+                    Parames = item.Parameters != null ? JsonSerializer.Serialize(item.Parameters.Select(x => x.Name)) : string.Empty,
                 });
             }
             return res;

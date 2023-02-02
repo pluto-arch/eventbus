@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client;
 
-namespace Pluto.EventBusRabbitMQ.Options
+namespace Dncy.EventBus.RabbitMQ.Options
 {
     public class RabbitMQDeclaration
     {
@@ -18,7 +18,7 @@ namespace Pluto.EventBusRabbitMQ.Options
         /// 交换机类型
         /// <see cref="ExchangeType"/>
         /// </summary>
-        public string ExchangeType { get; set; } = RabbitMQ.Client.ExchangeType.Direct;
+        public string ConfigExchangeType { get; set; } = ExchangeType.Direct;
     }
 }
 

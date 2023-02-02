@@ -1,22 +1,49 @@
-﻿using System;
+﻿using Dncy.EventBus.Abstract;
+using Dncy.EventBus.Abstract.EventActivator;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
+using Dncy.EventBus.RabbitMQ.Connection;
+using Dncy.EventBus.RabbitMQ.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using RabbitMQ.Client;
+
+/* 项目“Dncy.EventBus.RabbitMQ (net5.0)”的未合并的更改
+在此之前:
+using RabbitMQ.Client.Events;
+在此之后:
+using RabbitMQ.Client.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Dncy.EventBus.Abstract;
-using Dncy.EventBus.Abstract.EventActivator;
-using Dncy.EventBus.Abstract.Interfaces;
-using Dncy.EventBus.Abstract.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Pluto.EventBusRabbitMQ.Connection;
-using Pluto.EventBusRabbitMQ.Options;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+*/
 
-namespace Pluto.EventBusRabbitMQ
+/* 项目“Dncy.EventBus.RabbitMQ (netcoreapp3.1)”的未合并的更改
+在此之前:
+using RabbitMQ.Client.Events;
+在此之后:
+using RabbitMQ.Client.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
+using System.Threading.Tasks;
+*/
+using RabbitMQ.Client.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Dncy.EventBus.RabbitMQ
 {
     public class EventBusRabbitMQ : IDisposable
     {
@@ -72,7 +99,7 @@ namespace Pluto.EventBusRabbitMQ
 
             _publishChannel ??= CreatePublishChannel();
 
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event,options));
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event, options));
             _publishChannel.BasicPublish(
                 exchange: _queueDeclare.ExchangeName,
                 routingKey: @event.RouteKey,
@@ -150,7 +177,7 @@ namespace Pluto.EventBusRabbitMQ
             var channel = _connection.CreateModel();
             channel.ExchangeDeclare(
                 exchange: _queueDeclare.ExchangeName,
-                type: _queueDeclare.ExchangeType);
+                type: _queueDeclare.ConfigExchangeType);
 
             channel.QueueDeclare(queue: _queueDeclare.QueueName,
                 durable: true,
@@ -183,7 +210,7 @@ namespace Pluto.EventBusRabbitMQ
             var channel = _connection.CreateModel();
             channel.ExchangeDeclare(
                 exchange: _queueDeclare.ExchangeName,
-                type: _queueDeclare.ExchangeType);
+                type: _queueDeclare.ConfigExchangeType);
 
             channel.CallbackException += (sender, ea) =>
             {

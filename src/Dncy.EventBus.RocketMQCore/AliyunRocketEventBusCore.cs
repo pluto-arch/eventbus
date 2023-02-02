@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Aliyun.MQ;
+using Aliyun.MQ.Model;
+using Aliyun.MQ.Model.Exp;
+using Dncy.EventBus.Abstract;
+using Dncy.EventBus.Abstract.EventActivator;
+using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
+using Dncy.EventBus.AliyunRocketMQCore.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Aliyun.MQ;
-using Aliyun.MQ.Model;
-using Aliyun.MQ.Model.Exp;
-using Dncy.EventBus.Abstract.EventActivator;
-using Dncy.EventBus.AliyunRocketMQCore.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Dncy.EventBus.Abstract;
-using Dncy.EventBus.Abstract.Interfaces;
-using Dncy.EventBus.Abstract.Models;
 
 namespace Dncy.EventBus.AliyunRocketMQCore
 {
@@ -75,9 +75,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                 return;
             }
             @event.RouteKey ??= @event.GetType().Name;
-            @event.RouteKey = @event.RouteKey.StartsWith("/")?@event.RouteKey:$"/{@event.RouteKey}";
+            @event.RouteKey = @event.RouteKey.StartsWith("/") ? @event.RouteKey : $"/{@event.RouteKey}";
             var p = _producer.Value;
-            var messageBody = JsonSerializer.Serialize<object>(@event,options);
+            var messageBody = JsonSerializer.Serialize<object>(@event, options);
             var topicMsg = new TopicMessage(messageBody, @event.RouteKey)
             {
                 Id = @event.Id
@@ -96,7 +96,7 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             await Task.CompletedTask;
         }
 
-        public Task StartBasicConsume(CancellationToken tokenSource=default)
+        public Task StartBasicConsume(CancellationToken tokenSource = default)
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -107,7 +107,7 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                     return;
                 }
                 _logger.ConsumerInitialized(_mqOption.Topic, _mqOption.GroupId);
-                while(true)
+                while (true)
                 {
                     if (tokenSource is { IsCancellationRequested: true })
                     {
@@ -125,14 +125,14 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                         foreach (var message in messages)
                         {
                             _logger.MessageConsumed(message.MessageTag, message.Body);
-                            consumer.AckMessage(new List<string>() {message.ReceiptHandle});
+                            consumer.AckMessage(new List<string>() { message.ReceiptHandle });
                             await TryStoredEvent(message.MessageTag, message.Body);
                             await _ieha.ProcessRequestAsync(message.MessageTag, message.Body);
                         }
                     }
                     catch (Exception e)
                     {
-                        if (!(e is MessageNotExistException))
+                        if (!( e is MessageNotExistException ))
                         {
                             _logger.LogError(e, "consumer message has an error :{message}", e.Message);
                         }

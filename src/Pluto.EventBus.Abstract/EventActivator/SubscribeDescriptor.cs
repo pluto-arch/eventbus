@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
-using System;
 
 namespace Dncy.EventBus.Abstract.EventActivator
 {
@@ -25,7 +25,7 @@ namespace Dncy.EventBus.Abstract.EventActivator
 
     public class SubscribeDescriptorItemModel
     {
-        public string Id { get; set;}
+        public string Id { get; set; }
 
         public string RouteTemplate { get; set; }
 

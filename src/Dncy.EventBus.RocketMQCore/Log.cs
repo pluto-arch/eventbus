@@ -1,7 +1,53 @@
-﻿using System;
+﻿
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (net6.0)”的未合并的更改
+在此之前:
+using System;
 using Aliyun.MQ.Model;
+在此之后:
+using Aliyun.MQ.Model;
+*/
+
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (net5.0)”的未合并的更改
+在此之前:
+using System;
+using Aliyun.MQ.Model;
+在此之后:
+using Aliyun.MQ.Model;
+*/
+
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (netcoreapp3.1)”的未合并的更改
+在此之前:
+using System;
+using Aliyun.MQ.Model;
+在此之后:
+using Aliyun.MQ.Model;
+*/
 using Microsoft.Extensions.Logging;
+
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (net6.0)”的未合并的更改
+在此之前:
 using System.Reflection.Emit;
+在此之后:
+using System;
+using System.Reflection.Emit;
+*/
+
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (net5.0)”的未合并的更改
+在此之前:
+using System.Reflection.Emit;
+在此之后:
+using System;
+using System.Reflection.Emit;
+*/
+
+/* 项目“Dncy.EventBus.AliyunRocketMQCore (netcoreapp3.1)”的未合并的更改
+在此之前:
+using System.Reflection.Emit;
+在此之后:
+using System;
+using System.Reflection.Emit;
+*/
+using System;
 #pragma warning disable SYSLIB1006
 
 namespace Dncy.EventBus.AliyunRocketMQCore
@@ -72,8 +118,8 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(0, nameof(TaskCancelled)), "event bus {name} task has been cancelled.");
 
 
-        private static readonly Action<ILogger,string,string, Exception> _consumerInitialized
-            = LoggerMessage.Define<string,string>(LogLevel.Information, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
+        private static readonly Action<ILogger, string, string, Exception> _consumerInitialized
+            = LoggerMessage.Define<string, string>(LogLevel.Information, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
 
 
         private static readonly Action<ILogger, string, string, Exception> _messageConsumed
@@ -108,9 +154,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore
         }
 
 
-        public static void ConsumerInitialized(this ILogger logger, string topic,string groupId)
+        public static void ConsumerInitialized(this ILogger logger, string topic, string groupId)
         {
-            _consumerInitialized(logger,topic,groupId, null);
+            _consumerInitialized(logger, topic, groupId, null);
         }
 
 
