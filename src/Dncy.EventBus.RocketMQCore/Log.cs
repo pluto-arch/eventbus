@@ -1,53 +1,8 @@
 ﻿
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (net6.0)”的未合并的更改
-在此之前:
-using System;
-using Aliyun.MQ.Model;
-在此之后:
-using Aliyun.MQ.Model;
-*/
 
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (net5.0)”的未合并的更改
-在此之前:
-using System;
-using Aliyun.MQ.Model;
-在此之后:
-using Aliyun.MQ.Model;
-*/
-
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (netcoreapp3.1)”的未合并的更改
-在此之前:
-using System;
-using Aliyun.MQ.Model;
-在此之后:
-using Aliyun.MQ.Model;
-*/
 using Microsoft.Extensions.Logging;
+using System;
 
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (net6.0)”的未合并的更改
-在此之前:
-using System.Reflection.Emit;
-在此之后:
-using System;
-using System.Reflection.Emit;
-*/
-
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (net5.0)”的未合并的更改
-在此之前:
-using System.Reflection.Emit;
-在此之后:
-using System;
-using System.Reflection.Emit;
-*/
-
-/* 项目“Dncy.EventBus.AliyunRocketMQCore (netcoreapp3.1)”的未合并的更改
-在此之前:
-using System.Reflection.Emit;
-在此之后:
-using System;
-using System.Reflection.Emit;
-*/
-using System;
 #pragma warning disable SYSLIB1006
 
 namespace Dncy.EventBus.AliyunRocketMQCore

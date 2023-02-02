@@ -1,5 +1,5 @@
-﻿using Dncy.EventBus.Abstract.EventActivator;
-using Dncy.EventBus.Abstract.Models;
+﻿using Dncy.EventBus.Abstract.Models;
+using Dncy.EventBus.SubscribeActivator;
 using Microsoft.Extensions.Logging;
 
 namespace Sample.EventHandlers

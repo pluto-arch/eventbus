@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dncy.EventBus.Abstract.EventActivator
+namespace Dncy.EventBus.SubscribeActivator
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class SubscribeAttribute : Attribute

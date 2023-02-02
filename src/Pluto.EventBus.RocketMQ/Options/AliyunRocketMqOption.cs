@@ -1,32 +1,4 @@
-﻿/* 项目“Dncy.EventBus.AliyunRocketMQ (netcoreapp3.1)”的未合并的更改
-在此之前:
-using Microsoft.Extensions.Configuration;
-在此之后:
-using Microsoft.Extensions.Configuration;
-using Pluto;
-using Pluto.EventBus;
-using Pluto.EventBus.AliyunRocketMQ;
-using Dncy.EventBus.AliyunRocketMQ.Options;
-*/
-
-/* 项目“Dncy.EventBus.AliyunRocketMQ (netcoreapp3.1)”的未合并的更改
-在此之前:
-using Microsoft.Extensions.Configuration;
-在此之后:
-using Microsoft.Extensions.Configuration;
-using System;
-using System.ComponentModel;
-*/
-
-/* 项目“Dncy.EventBus.AliyunRocketMQ (net5.0)”的未合并的更改
-在此之前:
-using Microsoft.Extensions.Configuration;
-在此之后:
-using Microsoft.Extensions.Configuration;
-using System;
-using System.ComponentModel;
-*/
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System.ComponentModel;
 
 namespace Dncy.EventBus.AliyunRocketMQ.Options

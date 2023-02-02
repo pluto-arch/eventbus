@@ -1,4 +1,4 @@
-﻿namespace Dncy.EventBus.Abstract.EventActivator
+﻿namespace Dncy.EventBus.SubscribeActivator
 {
     public class IntegrationEventHandler
     {

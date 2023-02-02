@@ -1,4 +1,4 @@
-﻿using Dncy.EventBus.Abstract.EventActivator;
+﻿using Dncy.EventBus.SubscribeActivator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sample.Events;
@@ -11,9 +11,9 @@ public class DemoConsumer : IntegrationEventHandler
 
     private static readonly Random Random = new Random();
 
-    public DemoConsumer(ILogger<DemoConsumer> logger=null)
+    public DemoConsumer(ILogger<DemoConsumer> logger = null)
     {
-        _logger = logger??NullLogger<DemoConsumer>.Instance;
+        _logger = logger ?? NullLogger<DemoConsumer>.Instance;
     }
 
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dncy.EventBus.RabbitMQ.Connection
 {
@@ -15,10 +15,10 @@ namespace Dncy.EventBus.RabbitMQ.Connection
 
         bool _disposed;
 
-        public DefaultRabbitMQConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQConnection> logger=null)
+        public DefaultRabbitMQConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQConnection> logger = null)
         {
             _connectionFactory = connectionFactory;
-            _logger = logger??NullLogger<DefaultRabbitMQConnection>.Instance;
+            _logger = logger ?? NullLogger<DefaultRabbitMQConnection>.Instance;
         }
 
 

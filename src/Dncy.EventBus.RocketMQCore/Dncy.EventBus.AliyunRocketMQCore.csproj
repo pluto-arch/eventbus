@@ -34,6 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Dncy.EventBus.Activator\Dncy.EventBus.SubscribeActivator.csproj" />
 	  <ProjectReference Include="..\Pluto.EventBus.Abstract\Dncy.EventBus.Abstract.csproj" />
 	</ItemGroup>
 </Project>

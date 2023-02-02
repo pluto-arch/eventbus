@@ -2,7 +2,6 @@
 using Aliyun.MQ.Model;
 using Aliyun.MQ.Model.Exp;
 using Dncy.EventBus.Abstract;
-using Dncy.EventBus.Abstract.EventActivator;
 using Dncy.EventBus.Abstract.Interfaces;
 using Dncy.EventBus.Abstract.Models;
 using Dncy.EventBus.AliyunRocketMQCore.Options;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Dncy.EventBus.SubscribeActivator;
 
 namespace Dncy.EventBus.AliyunRocketMQCore
 {

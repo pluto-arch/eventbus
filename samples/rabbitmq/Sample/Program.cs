@@ -1,7 +1,7 @@
-﻿using Dncy.EventBus.Abstract.EventActivator;
-using Dncy.EventBus.RabbitMQ;
+﻿using Dncy.EventBus.RabbitMQ;
 using Dncy.EventBus.RabbitMQ.Connection;
 using Dncy.EventBus.RabbitMQ.Options;
+using Dncy.EventBus.SubscribeActivator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;

@@ -4,16 +4,6 @@ using Aliyun.MQ.Model.Exp;
 using Dncy.EventBus.Abstract;
 using Dncy.EventBus.Abstract.Interfaces;
 using Dncy.EventBus.Abstract.Models;
-/* 项目“Dncy.EventBus.AliyunRocketMQ (netcoreapp3.1)”的未合并的更改
-在此之前:
-using Dncy.EventBus.AliyunRocketMQ.Options;
-在此之后:
-using Dncy.EventBus.AliyunRocketMQ.Options;
-using Pluto;
-using Pluto.EventBus;
-using Pluto.EventBus.AliyunRocketMQ;
-using Dncy.EventBus.AliyunRocketMQ;
-*/
 using Dncy.EventBus.AliyunRocketMQ.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -1,8 +1,8 @@
-﻿using Dncy.EventBus.Abstract.Extensions;
+﻿using System;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -10,9 +10,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Dncy.EventBus.Abstract.EventActivator
+namespace Dncy.EventBus.SubscribeActivator
 {
     public class IntegrationEventHandlerActivator
     {
@@ -41,7 +40,7 @@ namespace Dncy.EventBus.Abstract.EventActivator
         {
             using (var sc = _scopeFactory.CreateScope())
             {
-                var logger = sc.ServiceProvider.GetService<ILogger<IntegrationEventHandlerActivator>>()??NullLogger<IntegrationEventHandlerActivator>.Instance;
+                var logger = sc.ServiceProvider.GetService<ILogger<IntegrationEventHandlerActivator>>() ?? NullLogger<IntegrationEventHandlerActivator>.Instance;
                 logger.LogDebug("receive message：{msg}. on route：{route}。", message, route);
                 foreach (SubscribeDescriptor subscribeDescriptor in _lazySubscribes.Value.Where(x => !disabled.Contains(x.Id)).OrderBy(x => x.Order))
                 {
@@ -119,7 +118,7 @@ namespace Dncy.EventBus.Abstract.EventActivator
 
         private static ObjectFactory CreateOrCacheObjectFactory(Type instanceType)
         {
-            ObjectFactory? createFactory;
+            ObjectFactory createFactory;
             if (_lazyCacheObjFactory.Value.ContainsKey(instanceType))
             {
                 createFactory = _lazyCacheObjFactory.Value[instanceType];

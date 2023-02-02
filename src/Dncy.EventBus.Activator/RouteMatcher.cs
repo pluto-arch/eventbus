@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 
-namespace Dncy.EventBus.Abstract.EventActivator
+namespace Dncy.EventBus.SubscribeActivator
 {
     public class RouteMatcher
     {

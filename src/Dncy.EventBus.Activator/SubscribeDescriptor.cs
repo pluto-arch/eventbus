@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Dncy.EventBus.Abstract.EventActivator
+namespace Dncy.EventBus.SubscribeActivator
 {
     public class SubscribeDescriptor
     {

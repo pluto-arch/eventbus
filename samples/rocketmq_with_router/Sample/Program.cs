@@ -1,6 +1,6 @@
-﻿using Dncy.EventBus.Abstract.EventActivator;
-using Dncy.EventBus.AliyunRocketMQCore;
+﻿using Dncy.EventBus.AliyunRocketMQCore;
 using Dncy.EventBus.AliyunRocketMQCore.Options;
+using Dncy.EventBus.SubscribeActivator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sample.EventHandlers;
