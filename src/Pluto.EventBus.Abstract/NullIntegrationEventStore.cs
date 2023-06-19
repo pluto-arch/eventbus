@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Dncy.EventBus.Abstract.Interfaces;
+﻿using Dncy.EventBus.Abstract.Interfaces;
 using Dncy.EventBus.Abstract.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Dncy.EventBus.Abstract
 {
-    public class NullIntegrationEventStore:IIntegrationEventStore
+    public class NullIntegrationEventStore : IIntegrationEventStore
     {
         /// <inheritdoc />
-        public async Task SaveAsync(string eventName, string eventBody,string eventBusName=null)
+        public async Task SaveAsync(string eventName, string eventBody, string eventBusName = null)
         {
             await Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> GetListAllAsync(string eventBusName=null)
+        public async Task<IEnumerable<string>> GetListAllAsync(string eventBusName = null)
         {
             await Task.CompletedTask;
             return default;
@@ -34,6 +34,6 @@ namespace Dncy.EventBus.Abstract
             return default;
         }
 
-        public static IIntegrationEventStore Instance { get; set; }=new NullIntegrationEventStore();
+        public static IIntegrationEventStore Instance { get; set; } = new NullIntegrationEventStore();
     }
 }

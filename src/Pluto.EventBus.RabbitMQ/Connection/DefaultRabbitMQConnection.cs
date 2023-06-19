@@ -1,12 +1,11 @@
-﻿using System;
-using System.Security.Authentication;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Pluto.EventBusRabbitMQ.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System;
+using System.Threading.Tasks;
 
-namespace Pluto.EventBusRabbitMQ.Connection
+namespace Dncy.EventBus.RabbitMQ.Connection
 {
     public class DefaultRabbitMQConnection : IRabbitMQConnection
     {
@@ -16,10 +15,10 @@ namespace Pluto.EventBusRabbitMQ.Connection
 
         bool _disposed;
 
-        public DefaultRabbitMQConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQConnection> logger)
+        public DefaultRabbitMQConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQConnection> logger = null)
         {
             _connectionFactory = connectionFactory;
-            _logger = logger;
+            _logger = logger ?? NullLogger<DefaultRabbitMQConnection>.Instance;
         }
 
 

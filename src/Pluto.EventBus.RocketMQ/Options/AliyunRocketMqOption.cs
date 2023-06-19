@@ -1,13 +1,12 @@
-﻿using System.ComponentModel;
-using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 
-namespace Pluto.EventBus.AliyunRocketMQ
+namespace Dncy.EventBus.AliyunRocketMQ.Options
 {
 
     public static class AliyunRocketMqOptionExtension
     {
-        public static void ReadFromConfiguration(this AliyunRocketMqOption options,IConfiguration configuration)
+        public static void ReadFromConfiguration(this AliyunRocketMqOption options, IConfiguration configuration)
         {
             options = configuration.GetSection("AliyunRocketMQ").Get<AliyunRocketMqOption>();
         }

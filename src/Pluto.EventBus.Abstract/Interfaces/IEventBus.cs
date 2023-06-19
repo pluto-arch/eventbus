@@ -1,13 +1,11 @@
 ﻿using Dncy.EventBus.Abstract.Models;
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dncy.EventBus.Abstract.Interfaces
 {
     public interface IEventBus
     {
-        abstract string Name {get;}
+        abstract string Name { get; }
         /// <summary>
         /// 发布事件
         /// </summary>

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dncy.EventBus.Abstract.Interfaces;
+using Dncy.EventBus.Abstract.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dncy.EventBus.Abstract.Interfaces;
-using Dncy.EventBus.Abstract.Models;
 
 namespace Dncy.EventBus.Abstract
 {
@@ -16,7 +16,7 @@ namespace Dncy.EventBus.Abstract
         private readonly List<Type> _eventTypes;
         public event Action<string, SubscriptionInfo> OnEventRemoved;
 
-        
+
 
         public InMemoryEventBusSubscriptionsManager()
         {
@@ -29,7 +29,7 @@ namespace Dncy.EventBus.Abstract
 
         public void Clear(string eventBusName = null)
         {
-            if (eventBusName==null)
+            if (eventBusName == null)
             {
                 _handlers.Clear();
             }
@@ -47,8 +47,8 @@ namespace Dncy.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public void AddSubscription<T, TH>(string eventBusName=null) 
-            where T : IntegrationEvent 
+        public void AddSubscription<T, TH>(string eventBusName = null)
+            where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
             var eventName = $"{eventBusName}_{GetEventKey<T>()}";
@@ -63,15 +63,15 @@ namespace Dncy.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public void AddDynamicSubscription<TH>(string eventName, string eventBusName = null) 
+        public void AddDynamicSubscription<TH>(string eventName, string eventBusName = null)
             where TH : IDynamicIntegrationEventHandler
         {
             DoAddSubscription(typeof(TH), $"{eventBusName}_{eventName}", isDynamic: true);
         }
 
         /// <inheritdoc />
-        public void RemoveSubscription<T, TH>(string eventBusName = null) 
-            where T : IntegrationEvent 
+        public void RemoveSubscription<T, TH>(string eventBusName = null)
+            where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
             var eventName = $"{eventBusName}_{GetEventKey<T>()}";
@@ -80,7 +80,7 @@ namespace Dncy.EventBus.Abstract
         }
 
         /// <inheritdoc />
-        public void RemoveDynamicSubscription<TH>(string eventName, string eventBusName = null) 
+        public void RemoveDynamicSubscription<TH>(string eventName, string eventBusName = null)
             where TH : IDynamicIntegrationEventHandler
         {
             eventName = $"{eventBusName}_{eventName}";
@@ -89,7 +89,7 @@ namespace Dncy.EventBus.Abstract
         }
 
         /// <inheritdoc />
-        public bool HasSubscriptionsForEvent<T>(string eventBusName = null) 
+        public bool HasSubscriptionsForEvent<T>(string eventBusName = null)
             where T : IntegrationEvent
         {
             var key = $"{eventBusName}_{GetEventKey<T>()}";
@@ -106,7 +106,7 @@ namespace Dncy.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>(string eventBusName = null) 
+        public IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>(string eventBusName = null)
             where T : IntegrationEvent
         {
             var key = $"{eventBusName}_{GetEventKey<T>()}";
@@ -118,7 +118,7 @@ namespace Dncy.EventBus.Abstract
 
 
         /// <inheritdoc />
-        public IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string eventName, string eventBusName = null) => _handlers.ContainsKey($"{eventBusName}_{eventName}") ?_handlers[$"{eventBusName}_{eventName}"] :null;
+        public IEnumerable<SubscriptionInfo> TryGetHandlersForEvent(string eventName, string eventBusName = null) => _handlers.ContainsKey($"{eventBusName}_{eventName}") ? _handlers[$"{eventBusName}_{eventName}"] : null;
 
         /// <inheritdoc />
         public string GetEventKey<T>()

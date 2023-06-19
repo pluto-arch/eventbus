@@ -1,7 +1,8 @@
-﻿using System;
-using Aliyun.MQ.Model;
+﻿
+
 using Microsoft.Extensions.Logging;
-using System.Reflection.Emit;
+using System;
+
 #pragma warning disable SYSLIB1006
 
 namespace Dncy.EventBus.AliyunRocketMQCore
@@ -72,8 +73,8 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(0, nameof(TaskCancelled)), "event bus {name} task has been cancelled.");
 
 
-        private static readonly Action<ILogger,string,string, Exception> _consumerInitialized
-            = LoggerMessage.Define<string,string>(LogLevel.Information, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
+        private static readonly Action<ILogger, string, string, Exception> _consumerInitialized
+            = LoggerMessage.Define<string, string>(LogLevel.Information, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
 
 
         private static readonly Action<ILogger, string, string, Exception> _messageConsumed
@@ -108,9 +109,9 @@ namespace Dncy.EventBus.AliyunRocketMQCore
         }
 
 
-        public static void ConsumerInitialized(this ILogger logger, string topic,string groupId)
+        public static void ConsumerInitialized(this ILogger logger, string topic, string groupId)
         {
-            _consumerInitialized(logger,topic,groupId, null);
+            _consumerInitialized(logger, topic, groupId, null);
         }
 
 

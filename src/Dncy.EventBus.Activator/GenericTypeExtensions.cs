@@ -2,10 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dncy.EventBus.AliyunRocketMQCore
+namespace Dncy.EventBus.SubscribeActivator
 {
-    internal static class TypeExtensions
+    internal static class GenericTypeExtensions
     {
+        /// <summary>
+        /// 获取泛型类型名称
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal static string GetGenericTypeName(this Type type)
+        {
+            var typeName = string.Empty;
+
+            if (type.IsGenericType)
+            {
+                var genericTypes = string.Join(",", type.GetGenericArguments().Select(t => t.Name).ToArray());
+                typeName = $"{type.Name.Remove(type.Name.IndexOf('`'))}<{genericTypes}>";
+            }
+            else
+            {
+                typeName = type.Name;
+            }
+
+            return typeName;
+        }
+
+        /// <summary>
+        /// 获取泛型类型名称
+        /// </summary>
+        /// <param name="object"></param>
+        /// <returns></returns>
+        internal static string GetGenericTypeName(this object @object)
+        {
+            return @object.GetType().GetGenericTypeName();
+        }
+
+
         internal static bool IsOneOf(this Type type, params Type[] possibleTypes)
         {
             return possibleTypes.Any(possibleType => possibleType == type);
@@ -21,22 +54,21 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             return possibleBaseTypes.Any(possibleBaseType => possibleBaseType.IsAssignableFrom(type));
         }
 
-        internal static bool IsConstructedFrom(this Type type, Type genericType, out Type? constructedType)
+        internal static bool IsConstructedFrom(this Type type, Type genericType, out Type constructedType)
         {
             constructedType = new[] { type }
                 .Union(type.GetInheritanceChain())
                 .Union(type.GetInterfaces())
                 .FirstOrDefault(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == genericType);
-
-            return ( constructedType != null );
+            return constructedType != null;
         }
 
         internal static bool IsReferenceOrNullableType(this Type type)
         {
-            return ( !type.IsValueType || Nullable.GetUnderlyingType(type) != null );
+            return !type.IsValueType || Nullable.GetUnderlyingType(type) != null;
         }
 
-        internal static object? GetDefaultValue(this Type type)
+        internal static object GetDefaultValue(this Type type)
         {
             return type.IsValueType
                 ? Activator.CreateInstance(type)

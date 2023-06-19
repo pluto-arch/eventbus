@@ -1,8 +1,7 @@
 ﻿## aliyun rocketmq net core事件总线
-
 ## 仅支持阿里云rockermq 4和之前的http连接方式。
 
-## 事件处理程序使用激活器方式，不需要使用subscribemanager
+> 事件处理程序使用激活器方式
 
 ### 使用实例
 
@@ -10,23 +9,23 @@
 
 ```csharp
 // 注入消息激活器
-builder.Services.AddSingleton<MessageHandlerActivator>();
+builder.Services.AddSingleton<IntegrationEventHandlerActivator>();
 
 // 注入事件总线
 builder.Services.AddSingleton<AliyunRocketEventBusCore>(sp =>
 {
     var logger = sp.GetRequiredService<ILogger<AliyunRocketEventBusCore>>();
-    var msa = sp.GetRequiredService<MessageHandlerActivator>();
+    var msa = sp.GetRequiredService<IntegrationEventHandlerActivator>();
     var options = new AliyunRocketMqOption()
     {
-        InstranceId="MQ_INST_1226776583375087_BYV79b8r",
-        Topic="t_preorder",
-        GroupId="GID_preorder",
-        HttpEndPoint="http://1226776583375087.mqrest.cn-hangzhou.aliyuncs.com",
+        InstranceId="",
+        Topic="",
+        GroupId="",
+        HttpEndPoint="http://.mqrest.cn-hangzhou.aliyuncs.com",
         AuthenticationConfiguration=new AliyunRocketMqOption.AuthenticationConfig
         {
-            AccessId = "LTAI5tQdff57euDVUmBhJamM",
-            AccessKey = "cPtS5EIgoeZlipypJCU0bZmBc87pg1",
+            AccessId = "",
+            AccessKey = "",
         }
     };
     return new AliyunRocketEventBusCore(options,msa,null,logger);

@@ -1,8 +1,5 @@
-﻿using Aliyun.MQ.Model;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace Pluto.EventBus.AliyunRocketMQ
 {
@@ -43,7 +40,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             EventId = 0,
             Level = LogLevel.Debug,
             Message = "successed genetate consumer for topic: `{topic}` . group: `{groupId}`")]
-        internal static partial void ConsumerInitialized(this ILogger logger, string topic,string groupId);
+        internal static partial void ConsumerInitialized(this ILogger logger, string topic, string groupId);
 
 
 
@@ -51,7 +48,7 @@ namespace Pluto.EventBus.AliyunRocketMQ
             EventId = 0,
             Level = LogLevel.Information,
             Message = "consumer message with messageKey: `{route}`. message: `{message}`")]
-        internal static partial void MessageConsumed(this ILogger logger, string route,string message);
+        internal static partial void MessageConsumed(this ILogger logger, string route, string message);
     }
 #else
 
@@ -72,8 +69,8 @@ namespace Pluto.EventBus.AliyunRocketMQ
             = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(0, nameof(TaskCancelled)), "event bus {name} task has been cancelled.");
 
 
-        private static readonly Action<ILogger,string,string, Exception> _consumerInitialized
-            = LoggerMessage.Define<string,string>(LogLevel.Debug, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
+        private static readonly Action<ILogger, string, string, Exception> _consumerInitialized
+            = LoggerMessage.Define<string, string>(LogLevel.Debug, new EventId(0, nameof(ConsumerInitialized)), "successed genetate consumer for topic: {topic} . group: {groupId}.");
 
 
         private static readonly Action<ILogger, string, string, Exception> _messageConsumed
@@ -108,9 +105,9 @@ namespace Pluto.EventBus.AliyunRocketMQ
         }
 
 
-        internal static void ConsumerInitialized(this ILogger logger, string topic,string groupId)
+        internal static void ConsumerInitialized(this ILogger logger, string topic, string groupId)
         {
-            _consumerInitialized(logger,topic,groupId, null);
+            _consumerInitialized(logger, topic, groupId, null);
         }
 
 
