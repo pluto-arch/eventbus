@@ -3,15 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNetCore.Routing;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 using Dncy.EventBus.Abstract.Extensions;
-using System.Threading;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Dncy.EventBus.Abstract.EventActivator
 {
@@ -22,14 +20,12 @@ namespace Dncy.EventBus.Abstract.EventActivator
         private static readonly List<string> _disabledSubscribe = new List<string>();
         private readonly ImmutableList<string> disabled = _disabledSubscribe.ToImmutableList();
 
-#if NETCOREAPP3_1
-        private static readonly Lazy<ConcurrentBag<SubscribeDescriptor>> _lazySubscribes = new Lazy<ConcurrentBag<SubscribeDescriptor>>(EnsureSubscribeDescriptorsInitialized, true);
-#else
-        private static readonly Lazy<ConcurrentBag<SubscribeDescriptor>> _lazySubscribes = new(EnsureSubscribeDescriptorsInitialized, true);
-#endif
+        private static readonly Lazy<ConcurrentBag<SubscribeDescriptor>> _lazySubscribes = 
+            new Lazy<ConcurrentBag<SubscribeDescriptor>>(EnsureSubscribeDescriptorsInitialized, true);
 
 
-        private static readonly Lazy<ConcurrentDictionary<Type, ObjectFactory>> _lazyCacheObjFactory = new Lazy<ConcurrentDictionary<Type, ObjectFactory>>(() => new ConcurrentDictionary<Type, ObjectFactory>(), true);
+        private static readonly Lazy<ConcurrentDictionary<Type, ObjectFactory>> _lazyCacheObjFactory 
+            = new Lazy<ConcurrentDictionary<Type, ObjectFactory>>(() => new ConcurrentDictionary<Type, ObjectFactory>(), true);
 
 
         public IntegrationEventHandlerActivator(IServiceScopeFactory scopeFactory)
@@ -46,11 +42,7 @@ namespace Dncy.EventBus.Abstract.EventActivator
                 logger.LogDebug("receive message：{msg}. on route：{route}。", message, route);
                 foreach (SubscribeDescriptor subscribeDescriptor in _lazySubscribes.Value.Where(x => !disabled.Contains(x.Id)).OrderBy(x=>x.Order))
                 {
-#if NETCOREAPP3_1
                     RouteValueDictionary matchedRouteValues = new RouteValueDictionary();
-#else
-                    RouteValueDictionary matchedRouteValues = new();
-#endif
 
                     if (RouteMatcher.TryMatch(subscribeDescriptor.AttributeRouteInfo.RouteTemplate, route, matchedRouteValues))
                     {

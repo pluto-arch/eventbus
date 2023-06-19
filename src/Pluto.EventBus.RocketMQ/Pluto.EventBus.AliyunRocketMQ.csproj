@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net70;net60;net50;netcoreapp3.1</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Description>阿里云RocketMQ 事件总线</Description>
 		<PackageId>Dncy.EventBus.AliyunRocketMQ</PackageId>
@@ -12,7 +12,7 @@
 	</PropertyGroup>
 
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net60' or '$(TargetFramework)' == 'net70'">
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="[6.0.0,)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[6.0.0,)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[6.0.0,)" />
@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net50' ">
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="[5.0.0,6.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[5.0.0,6.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[5.0.0,6.0.0)" />

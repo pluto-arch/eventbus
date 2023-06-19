@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+	  <TargetFrameworks>net70;net60;net50;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
 
@@ -9,7 +9,7 @@
 		<PackageReference Include="AliyunMQ.Http" Version="1.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net60' or '$(TargetFramework)' == 'net70' ">
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="[6.0.0,)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[6.0.0,)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[6.0.0,)" />
@@ -17,7 +17,7 @@
 		<PackageReference Include="Microsoft.Extensions.Options" Version="[6.0.0,)" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net50' ">
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="[5.0.0,6.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[5.0.0,6.0.0)" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="[5.0.0,6.0.0)" />
