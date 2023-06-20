@@ -20,7 +20,7 @@ public class DemoConsumer : IntegrationEventHandler
     [Subscribe("UserRegisterEvent")]
     public async Task PostMessageHandler(UserRegisterEvent customMessage)
     {
-        Console.WriteLine("UserRegisterEvent");
+        Console.WriteLine($"UserRegisterEvent : {customMessage.Email}");
         await Task.Delay(Random.Next(10, 500));
     }
 
@@ -29,7 +29,7 @@ public class DemoConsumer : IntegrationEventHandler
     [Subscribe("UserDisabledEvent")]
     public async Task UserDisabledEventHandler(UserRegisterEvent customMessage)
     {
-        Console.WriteLine("UserDisabledEvent");
+        Console.WriteLine($"UserDisabledEvent : {customMessage.Email}");
         await Task.Delay(Random.Next(15, 560));
     }
 }

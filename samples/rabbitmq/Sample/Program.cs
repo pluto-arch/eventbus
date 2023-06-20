@@ -28,7 +28,7 @@ namespace Sample
             {
                 var factory = new ConnectionFactory()
                 {
-                    HostName = "192.168.0.126",
+                    HostName = "localhost",
                     DispatchConsumersAsync = true
                 };
                 factory.UserName = "admin";
@@ -58,11 +58,26 @@ namespace Sample
             // 开始消费
             bus.StartBasicConsume();
 
-            // 发送事件
-            await bus.PublishAsync(new UserDisabledEvent
+            foreach (var item in Enumerable.Range(1,100))
             {
-                Email = "sample@ddd.com"
-            });
+                if (item%2!=0)
+                {
+                    // 发送事件
+                    await bus.PublishAsync(new UserDisabledEvent
+                    {
+                        Email = $"{item}@qq.com"
+                    });
+                }
+                else
+                {
+                    // 发送事件
+                    await bus.PublishAsync(new UserRegisterEvent
+                    {
+                        Email = $"{item}@foxmail.com"
+                    });
+                }
+            }
+            
             Console.ReadKey();
         }
     }
