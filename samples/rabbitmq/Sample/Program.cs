@@ -45,7 +45,7 @@ namespace Sample
                 {
                     ExchangeName = "orderExchange1",
                     QueueName = "orderCreated2",
-                    ConfigExchangeType = ExchangeType.Fanout
+                    ConfigExchangeType = ExchangeType.Direct
                 };
                 return new EventBusRabbitMQ(connection, declre, msa);
             });
@@ -70,11 +70,23 @@ namespace Sample
                 }
                 else
                 {
-                    // 发送事件
-                    await bus.PublishAsync(new UserRegisterEvent
+                    if ((item / 10)==4)
                     {
-                        Email = $"{item}@foxmail.com"
-                    });
+                        // 发送事件
+                        await bus.PublishAsync(new UserRegisterEvent
+                        {
+                            Email = $"{item}@foxmail.com"
+                        });
+                    }
+                    else
+                    {
+                        // 发送事件
+                        await bus.PublishAsync(new UserEnableEvent
+                        {
+                            Email = $"{item}@gmail.com"
+                        });
+                    }
+                   
                 }
             }
             

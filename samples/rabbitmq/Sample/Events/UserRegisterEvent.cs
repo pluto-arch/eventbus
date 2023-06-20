@@ -12,3 +12,9 @@ public class UserDisabledEvent : IntegrationEvent
 {
     public string Email { get; set; }
 }
+
+
+public class UserEnableEvent : IntegrationEvent
+{
+    public string Email { get; set; }
+}

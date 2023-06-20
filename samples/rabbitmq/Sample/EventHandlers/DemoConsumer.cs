@@ -20,7 +20,7 @@ public class DemoConsumer : IntegrationEventHandler
     [Subscribe("UserRegisterEvent")]
     public async Task PostMessageHandler(UserRegisterEvent customMessage)
     {
-        Console.WriteLine($"UserRegisterEvent : {customMessage.Email}");
+        //Console.WriteLine($"用户注册 : {customMessage.Email}");
         await Task.Delay(Random.Next(10, 500));
     }
 
@@ -29,7 +29,22 @@ public class DemoConsumer : IntegrationEventHandler
     [Subscribe("UserDisabledEvent")]
     public async Task UserDisabledEventHandler(UserRegisterEvent customMessage)
     {
-        Console.WriteLine($"UserDisabledEvent : {customMessage.Email}");
+        //Console.WriteLine($"停用用户 : {customMessage.Email}");
+        await Task.Delay(Random.Next(15, 560));
+    }
+
+
+    [Subscribe("UserEnableEvent")]
+    public async Task UserEnableEventHandler(UserEnableEvent customMessage)
+    {
+        Console.WriteLine($"启用用户1 : {customMessage.Email}");
+        await Task.Delay(Random.Next(15, 560));
+    }
+
+    [Subscribe("UserEnableEvent")]
+    public async Task UserEnableEventHandler2(UserEnableEvent customMessage)
+    {
+        Console.WriteLine($"启用用户2 : {customMessage.Email}");
         await Task.Delay(Random.Next(15, 560));
     }
 }
