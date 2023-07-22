@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dncy.EventBus.SubscribeActivator;
+using System.Data.Common;
 
 namespace Dncy.EventBus.RabbitMQ
 {
@@ -159,17 +160,12 @@ namespace Dncy.EventBus.RabbitMQ
 
             channel.CallbackException += (sender, ea) =>
             {
-                _logger.LogWarning(ea.Exception, "channel has an exception details: {detail}", ea.Detail);
+                _logger.LogInformation(ea.Exception, "channel has an exception details: {detail}", ea.Detail);
                 _channel?.Dispose();
                 _channel = CreateChannel();
+                StartBasicConsume();
             };
 
-            channel.ModelShutdown += (sender, ea) =>
-            {
-                _logger.LogWarning("channel is Shutdown with code {code}. message: {message}", ea.ReplyCode, ea.ReplyText);
-                _channel?.Dispose();
-                _channel = CreateChannel();
-            };
 
             return channel;
         }
@@ -186,14 +182,7 @@ namespace Dncy.EventBus.RabbitMQ
 
             channel.CallbackException += (sender, ea) =>
             {
-                _logger.LogWarning(ea.Exception, "publish channel has an exception details: {detail}", ea.Detail);
-                _publishChannel?.Dispose();
-                _publishChannel = CreateChannel();
-            };
-
-            channel.ModelShutdown += (sender, ea) =>
-            {
-                _logger.LogWarning("publish channel is Shutdown with code {code}. message: {message}", ea.ReplyCode, ea.ReplyText);
+                _logger.LogInformation(ea.Exception, "publish channel has an exception details: {detail}", ea.Detail);
                 _publishChannel?.Dispose();
                 _publishChannel = CreateChannel();
             };

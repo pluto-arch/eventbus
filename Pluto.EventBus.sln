@@ -23,17 +23,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rabbitmq", "rabbitmq", "{57
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocketmq_with_router", "rocketmq_with_router", "{CFAFF690-83C4-4C41-AAF3-9C1C254D9D9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "samples\rocketmq\Sample\Sample.csproj", "{BE84914C-12C4-42C3-9E87-D9D542C4A3AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "samples\rocketmq\Sample\Sample.csproj", "{BE84914C-12C4-42C3-9E87-D9D542C4A3AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "samples\rocketmq_with_router\Sample\Sample.csproj", "{6016583E-D026-4F93-A684-84A90162B0E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "samples\rocketmq_with_router\Sample\Sample.csproj", "{6016583E-D026-4F93-A684-84A90162B0E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "samples\rabbitmq\Sample\Sample.csproj", "{DE249075-2CED-46E5-8970-5DEB92BC689F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "samples\rabbitmq\Sample\Sample.csproj", "{DE249075-2CED-46E5-8970-5DEB92BC689F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dncy.EventBus.SubscribeActivator", "src\Dncy.EventBus.Activator\Dncy.EventBus.SubscribeActivator.csproj", "{80C90557-569F-4F75-BC2A-B8BEF2E392F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dncy.EventBus.SubscribeActivator", "src\Dncy.EventBus.Activator\Dncy.EventBus.SubscribeActivator.csproj", "{80C90557-569F-4F75-BC2A-B8BEF2E392F7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "use_activitor", "use_activitor", "{E3CC87D0-BC81-4229-97AD-8BB687AF2D22}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "use_handlemanager", "use_handlemanager", "{E36B3467-263C-4A5A-9D8F-535691810623}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rabbitmq_api", "samples\rabbitmq_api\rabbitmq_api.csproj", "{0EB4EB60-1F2F-41F9-A953-FAABAB997009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{80C90557-569F-4F75-BC2A-B8BEF2E392F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80C90557-569F-4F75-BC2A-B8BEF2E392F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80C90557-569F-4F75-BC2A-B8BEF2E392F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB4EB60-1F2F-41F9-A953-FAABAB997009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB4EB60-1F2F-41F9-A953-FAABAB997009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB4EB60-1F2F-41F9-A953-FAABAB997009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB4EB60-1F2F-41F9-A953-FAABAB997009}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{80C90557-569F-4F75-BC2A-B8BEF2E392F7} = {E3CC87D0-BC81-4229-97AD-8BB687AF2D22}
 		{E3CC87D0-BC81-4229-97AD-8BB687AF2D22} = {D19B4DDB-C8A7-43F3-AFFD-108D92DBB122}
 		{E36B3467-263C-4A5A-9D8F-535691810623} = {D19B4DDB-C8A7-43F3-AFFD-108D92DBB122}
+		{0EB4EB60-1F2F-41F9-A953-FAABAB997009} = {57E02CC9-E12C-4EF9-8AA6-26043682F293}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D54F706C-0266-4E79-A686-3ED75A83B493}
