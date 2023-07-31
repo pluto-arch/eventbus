@@ -16,31 +16,37 @@ namespace Dncy.EventBus.SubscribeActivator
     public class IntegrationEventHandlerActivator
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ILogger<IntegrationEventHandlerActivator> _logger;
 
         private static readonly List<string> _disabledSubscribe = new List<string>();
         private readonly ImmutableList<string> disabled = _disabledSubscribe.ToImmutableList();
 
         private static readonly Lazy<ConcurrentBag<SubscribeDescriptor>> _lazySubscribes = 
             new Lazy<ConcurrentBag<SubscribeDescriptor>>(EnsureSubscribeDescriptorsInitialized, true);
-
+        private readonly ImmutableList<SubscribeDescriptor> subscribes = _lazySubscribes.Value.ToImmutableList();
 
         private static readonly Lazy<ConcurrentDictionary<Type, ObjectFactory>> _lazyCacheObjFactory 
             = new Lazy<ConcurrentDictionary<Type, ObjectFactory>>(() => new ConcurrentDictionary<Type, ObjectFactory>(), true);
 
 
-        public IntegrationEventHandlerActivator(IServiceScopeFactory scopeFactory)
+        public IntegrationEventHandlerActivator(
+            IServiceScopeFactory scopeFactory,
+            ILogger<IntegrationEventHandlerActivator> logger = null)
         {
             _scopeFactory = scopeFactory;
+            _logger = logger?? NullLogger<IntegrationEventHandlerActivator>.Instance;;
         }
 
-
-        public async Task ProcessRequestAsync(string route, string message)
+        public async Task ProcessRequestAsync(string route, string message, IDictionary<string, string> properties, string eventBusName)
+        {
+            await ProcessRequestAsync( route,  message, properties,  eventBusName);
+        }
+        
+        public async Task ProcessRequestAsync(string route, string message,IDictionary<string,object> properties,string eventBusName)
         {
             using (var sc = _scopeFactory.CreateScope())
             {
-                var logger = sc.ServiceProvider.GetService<ILogger<IntegrationEventHandlerActivator>>() ?? NullLogger<IntegrationEventHandlerActivator>.Instance;
-                logger.LogDebug("receive message：{msg}. on route：{route}。", message, route);
-                foreach (SubscribeDescriptor subscribeDescriptor in _lazySubscribes.Value.Where(x => !disabled.Contains(x.Id)).OrderBy(x => x.Order))
+                foreach (SubscribeDescriptor subscribeDescriptor in subscribes.Where(x => !disabled.Contains(x.Id)&&x.SubscribeEventBusName==eventBusName).OrderBy(x => x.Order))
                 {
                     RouteValueDictionary matchedRouteValues = new RouteValueDictionary();
 
@@ -66,7 +72,7 @@ namespace Dncy.EventBus.SubscribeActivator
                                 throw new InvalidOperationException($"unable create {instanceType.Name} type");
                             }
                             var handler = (IntegrationEventHandler)createFactory(sc.ServiceProvider, arguments: null);
-                            handler.Context = new IntegrationEventContext { OriginalMessage = message };
+                            handler.Context = new IntegrationEventContext { Body = message,Properties=properties };
                             if (subscribeDescriptor.MethodInfo.ReturnType.IsAssignableTo(typeof(IAsyncResult)))
                             {
                                 var task = (Task)subscribeDescriptor.MethodInfo.Invoke(handler, parameterValues.ToArray());
@@ -95,9 +101,9 @@ namespace Dncy.EventBus.SubscribeActivator
         public List<SubscribeDescriptorItemModel> SubscribeList()
         {
             var res = new List<SubscribeDescriptorItemModel>();
-            var subs = _lazySubscribes.Value.ToImmutableList();
-            foreach (var item in subs)
+            foreach (var item in subscribes)
             {
+                var disabledInfo = disabled.Any(x => x == item.Id);
                 res.Add(new SubscribeDescriptorItemModel
                 {
                     Id = item.Id,
@@ -105,6 +111,8 @@ namespace Dncy.EventBus.SubscribeActivator
                     Order = item.Order,
                     MethodInfo = $"{item.MethodInfo.DeclaringType.Namespace}{item.MethodInfo.Name}",
                     Parames = item.Parameters != null ? JsonSerializer.Serialize(item.Parameters.Select(x => x.Name)) : string.Empty,
+                    SubscribeEventBusName = item.SubscribeEventBusName,
+                    Enabled = !disabledInfo
                 });
             }
             return res;
@@ -153,12 +161,7 @@ namespace Dncy.EventBus.SubscribeActivator
         }
         private static ConcurrentBag<SubscribeDescriptor> EnsureSubscribeDescriptorsInitialized()
         {
-#if NETCOREAPP3_1
             ConcurrentBag<SubscribeDescriptor> subscribeDescriptors = new ConcurrentBag<SubscribeDescriptor>();
-#else
-            ConcurrentBag<SubscribeDescriptor> subscribeDescriptors = new();
-#endif
-
 
             var exportedTypes = AppDomain.CurrentDomain.GetAssemblies().Where(e => !e.IsDynamic).SelectMany(e => e.ExportedTypes);
 
@@ -173,22 +176,13 @@ namespace Dncy.EventBus.SubscribeActivator
                     SubscribeAttribute subscribeAttribute = methodInfo.GetCustomAttribute<SubscribeAttribute>();
                     if (subscribeAttribute != null)
                     {
-#if NETCOREAPP3_1
                         SubscribeDescriptor subscribeDescriptor = new SubscribeDescriptor()
                         {
                             AttributeRouteInfo = subscribeAttribute,
                             MethodInfo = methodInfo,
-                            Parameters = methodInfo.GetParameters()
+                            Parameters = methodInfo.GetParameters(),
+                            SubscribeEventBusName= subscribeAttribute.SubscribeEventBusName
                         };
-#else
-                        SubscribeDescriptor subscribeDescriptor = new()
-                        {
-                            AttributeRouteInfo = subscribeAttribute,
-                            MethodInfo = methodInfo,
-                            Parameters = methodInfo.GetParameters()
-                        };
-#endif
-
                         subscribeDescriptors.Add(subscribeDescriptor);
                     }
                 }

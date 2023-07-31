@@ -29,7 +29,7 @@ namespace Dncy.EventBus.RabbitMQ
 
         static JsonSerializerOptions options = new JsonSerializerOptions
         {
-            WriteIndented = true
+            WriteIndented = false
         };
 
         private readonly RabbitMQDeclaration _queueDeclare;
@@ -50,12 +50,14 @@ namespace Dncy.EventBus.RabbitMQ
             _queueDeclare = queueDeclare;
             _eventStore = eventStore ?? NullIntegrationEventStore.Instance;
             _ieha = ieha;
+            _publishChannel = CreatePublishChannel();
+            _channel = CreateChannel();
         }
 
 
         public virtual string Name => nameof(EventBusRabbitMQ);
 
-        public void Publish(IntegrationEvent @event)
+        public virtual void Publish(IntegrationEvent @event)
         {
             if (!_connection.IsConnected)
                 _connection.TryConnect();
@@ -63,14 +65,32 @@ namespace Dncy.EventBus.RabbitMQ
             @event.RouteKey = @event.RouteKey.StartsWith("/") ? @event.RouteKey : $"/{@event.RouteKey}";
 
             var properties = _channel.CreateBasicProperties();
-            properties.DeliveryMode = 2;
-            if (@event.StartDeliverTime > 0)
+            properties.MessageId = @event.Id;
+            properties.Persistent = @event.Persistent;
+            properties.Timestamp = new AmqpTimestamp(@event.CreationDate.ToUnixTimeMilliseconds());;
+            if (@event.Expiration > 0)
             {
-                properties.Expiration = @event.StartDeliverTime.ToString();
+                properties.Expiration = @event.Expiration.ToString();
             }
-            _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
+            if (!string.IsNullOrEmpty(@event.Type))
+            {
+                properties.Type = @event.Type;
+            }
 
-            _publishChannel ??= CreatePublishChannel();
+            if (@event.StartDeliverTime>0)
+            {
+                _logger.LogWarning("rabbitmq does not support StartDeliverTime,place use Expiration.");
+            }
+            
+            if (@event.Properties!=null)
+            {
+                foreach (var item in @event.Properties)
+                {
+                    properties.Headers.Add(item.Key,item.Value);
+                }
+            }
+            
+            _logger.LogDebug("Publishing Event {EventId} to RabbitMQ with [Exchange={change},Queue={queue}]", @event.Id,_queueDeclare.ExchangeName,_queueDeclare.QueueName);
 
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<object>(@event, options));
             _publishChannel.BasicPublish(
@@ -81,17 +101,15 @@ namespace Dncy.EventBus.RabbitMQ
                 body: body);
         }
 
-        public Task PublishAsync(IntegrationEvent @event)
+        public virtual Task PublishAsync(IntegrationEvent @event)
         {
             Publish(@event);
             return Task.CompletedTask;
         }
 
-        public void StartBasicConsume()
+        public virtual void StartBasicConsume()
         {
-            _logger.LogTrace("Starting RabbitMQ basic consume ...");
-            _channel ??= CreateChannel();
-
+            _logger.LogDebug($"Starting RabbitMQ basic consume on {_queueDeclare.QueueName} ...");
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += Consumer_Received;
             DoInternalSubscription();
@@ -101,12 +119,20 @@ namespace Dncy.EventBus.RabbitMQ
                 consumer: consumer);
         }
 
+        /// <summary>
+        /// 只进行绑定，不进行消费者创建 - 延迟队列使用
+        /// </summary>
+        public virtual void StartDelayQueue()
+        {
+            DoInternalSubscription();
+        }
+        
 
 
         public List<SubscribeDescriptorItemModel> Subscribes => _ieha.SubscribeList();
 
 
-        public void DisableSubscribe(params string[] ids)
+        public virtual void DisableSubscribe(params string[] ids)
         {
             foreach (var item in ids)
             {
@@ -119,7 +145,7 @@ namespace Dncy.EventBus.RabbitMQ
         }
 
 
-        public void EnableSubscribe(params string[] ids)
+        public virtual void EnableSubscribe(params string[] ids)
         {
             foreach (var item in ids)
             {
@@ -143,34 +169,37 @@ namespace Dncy.EventBus.RabbitMQ
         }
 
 
+        /// <summary>
+        /// 创建消费者channel并绑定队列到交换机
+        /// </summary>
+        /// <returns></returns>
         private IModel CreateChannel()
         {
             if (!_connection.IsConnected)
                 _connection.TryConnect();
             var channel = _connection.CreateModel();
-            channel.ExchangeDeclare(
-                exchange: _queueDeclare.ExchangeName,
-                type: _queueDeclare.ConfigExchangeType);
-
+            
             channel.QueueDeclare(queue: _queueDeclare.QueueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null);
+                arguments:_queueDeclare.QueueArguments);
 
             channel.CallbackException += (sender, ea) =>
             {
-                _logger.LogInformation(ea.Exception, "channel has an exception details: {detail}", ea.Detail);
+                _logger.LogError(ea.Exception, "channel has an exception details: {@detail}", ea.Detail);
                 _channel?.Dispose();
                 _channel = CreateChannel();
                 StartBasicConsume();
             };
-
-
             return channel;
         }
 
 
+        /// <summary>
+        /// 创建生产者channel
+        /// </summary>
+        /// <returns></returns>
         private IModel CreatePublishChannel()
         {
             if (!_connection.IsConnected)
@@ -179,12 +208,11 @@ namespace Dncy.EventBus.RabbitMQ
             channel.ExchangeDeclare(
                 exchange: _queueDeclare.ExchangeName,
                 type: _queueDeclare.ConfigExchangeType);
-
             channel.CallbackException += (sender, ea) =>
             {
-                _logger.LogInformation(ea.Exception, "publish channel has an exception details: {detail}", ea.Detail);
+                _logger.LogError(ea.Exception, "publish channel has an exception details: {@detail}", ea.Detail);
                 _publishChannel?.Dispose();
-                _publishChannel = CreateChannel();
+                _publishChannel = CreatePublishChannel();
             };
 
             return channel;
@@ -198,13 +226,13 @@ namespace Dncy.EventBus.RabbitMQ
             var message = Encoding.UTF8.GetString(@event.Body.Span);
             try
             {
-                _logger.LogDebug("receiver message from mq：{eventName}. message：{message}", eventName, message);
+                _logger.LogDebug("RabbitMQ Message [Exchange={exchange},Queue={queue},RouteKey={eventName}] Message: {@message}", _queueDeclare.ExchangeName,_queueDeclare.QueueName, eventName, message);
                 if (message.ToLowerInvariant().Contains("throw-fake-exception"))
                 {
                     throw new InvalidOperationException($"Fake exception requested: \"{message}\"");
                 }
                 await TryStoredEvent(eventName, message);
-                await _ieha.ProcessRequestAsync(eventName, message);
+                await _ieha.ProcessRequestAsync(eventName, message,@event.BasicProperties.Headers,Name);
             }
             finally
             {

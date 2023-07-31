@@ -87,6 +87,19 @@ namespace Dncy.EventBus.AliyunRocketMQCore
             {
                 topicMsg.StartDeliverTime = @event.StartDeliverTime;
             }
+            if (@event.Expiration>0)
+            {
+                _logger.LogWarning("aliyun rocketmq does not support Expiration,place use StartDeliverTime.");
+            }
+
+            if (@event.Properties is not null and {Count:>0})
+            {
+                foreach (var item in @event.Properties)
+                {
+                    topicMsg.Properties.Add(item.Key,item.Value);
+                }
+            }
+            _logger.LogDebug("Publishing Event {EventId} to AliyunRocketMQ with [Topic={topic},GroupID={groupId}]", @event.Id,_mqOption.Topic,_mqOption.GroupId);
             p.PublishMessage(topicMsg);
         }
 
@@ -114,6 +127,7 @@ namespace Dncy.EventBus.AliyunRocketMQCore
                         tokenSource.ThrowIfCancellationRequested();
                     }
 
+                    var handled = new List<string>();
                     try
                     {
                         var messages = consumer?.ConsumeMessage(_mqOption.BitchSize, _mqOption.WaitSecond);
@@ -124,18 +138,22 @@ namespace Dncy.EventBus.AliyunRocketMQCore
 
                         foreach (var message in messages)
                         {
-                            _logger.MessageConsumed(message.MessageTag, message.Body);
-                            consumer.AckMessage(new List<string>() { message.ReceiptHandle });
+                            _logger.LogDebug("AliyunRocketMQ Message [Topic={exchange},GroupID={queue},EventName={eventName}] Message: {@message}",_mqOption.Topic,_mqOption.GroupId, message.MessageTag, message);
+                            handled.Add(message.ReceiptHandle);
                             await TryStoredEvent(message.MessageTag, message.Body);
-                            await _ieha.ProcessRequestAsync(message.MessageTag, message.Body);
+                            await _ieha.ProcessRequestAsync(message.MessageTag, message.Body,message.Properties,Name);
                         }
                     }
                     catch (Exception e)
                     {
-                        if (!( e is MessageNotExistException ))
+                        if (!(e is MessageNotExistException))
                         {
                             _logger.LogError(e, "consumer message has an error :{message}", e.Message);
                         }
+                    }
+                    finally
+                    {
+                        consumer.AckMessage(handled);
                     }
                 }
             }, tokenSource);

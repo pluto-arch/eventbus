@@ -1,4 +1,5 @@
-﻿using Dncy.EventBus.SubscribeActivator;
+﻿using Dncy.EventBus.RabbitMQ;
+using Dncy.EventBus.SubscribeActivator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sample.Events;
@@ -34,10 +35,18 @@ public class DemoConsumer : IntegrationEventHandler
     //}
 
 
-    [Subscribe("UserEnableEvent")]
+    [Subscribe("UserEnableEvent",nameof(EventBusRabbitMQ))]
     public async Task UserEnableEventHandler(UserEnableEvent customMessage)
     {
         Console.WriteLine($"启用用户1 : {customMessage.Email}");
+        await Task.Delay(Random.Next(15, 560));
+    }
+    
+    
+    [Subscribe("delay_key",nameof(EventBusRabbitMQ))]
+    public async Task DelayMsg(UserEnableEvent customMessage)
+    {
+        Console.WriteLine($"启用用户1 - 延迟后的 : {customMessage.Email} - 时间：{DateTime.Now}");
         await Task.Delay(Random.Next(15, 560));
     }
 

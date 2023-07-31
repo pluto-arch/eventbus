@@ -17,9 +17,16 @@ namespace Dncy.EventBus.SubscribeActivator
 
 
         private const string prefix = "/";
+        
+        /// <summary>
+        /// 订阅的总线名称
+        /// </summary>
+        public string SubscribeEventBusName { get; set; }
+        
 
-        public SubscribeAttribute(string routeTemplate)
+        public SubscribeAttribute(string routeTemplate,string subscribeEventBusName)
         {
+            SubscribeEventBusName = subscribeEventBusName;
             if (routeTemplate.StartsWith(prefix))
             {
                 RouteTemplate = routeTemplate;

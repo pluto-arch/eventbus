@@ -20,6 +20,8 @@ namespace Dncy.EventBus.SubscribeActivator
         public MethodInfo MethodInfo { get; set; } = default!;
 
         public IList<ParameterInfo> Parameters { get; set; } = Array.Empty<ParameterInfo>();
+        
+        public string SubscribeEventBusName { get; set; }
     }
 
 
@@ -34,5 +36,9 @@ namespace Dncy.EventBus.SubscribeActivator
         public string MethodInfo { get; set; }
 
         public string Parames { get; set; }
+        
+        public string SubscribeEventBusName { get; set; }
+        
+        public bool Enabled { get; set; }
     }
 }
