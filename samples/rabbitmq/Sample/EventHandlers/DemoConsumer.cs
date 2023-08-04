@@ -35,10 +35,10 @@ public class DemoConsumer : IntegrationEventHandler
     //}
 
 
-    [Subscribe("UserEnableEvent",nameof(EventBusRabbitMQ))]
-    public async Task UserEnableEventHandler(UserEnableEvent customMessage)
+    [Subscribe("handle_msg",nameof(EventBusRabbitMQ))]
+    public async Task UserEnableEventHandler(ChatMessageIntegrationEvent customMessage)
     {
-        Console.WriteLine($"启用用户1 : {customMessage.Email}");
+        Console.WriteLine($"启用用户1 : {customMessage?.Message}");
         await Task.Delay(Random.Next(15, 560));
     }
     

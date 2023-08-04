@@ -100,31 +100,25 @@ namespace Sample
             bus2.StartBasicConsume();
             // 发送事件
             
-            
-            var t1 = Task.Run(async () =>
+            await bus2.PublishAsync(new ChatMessageIntegrationEvent("a","b","ccc")
             {
-                foreach (var item in Enumerable.Range(1,100))
-                {
-                    await bus.PublishAsync(new UserEnableEvent
-                    {
-                        Email = $"这是个延迟消息{item}@gmail.com"
-                    });
-                    await Task.Delay(800);
-                }
+                RouteKey = "handle_msg"
             });
-            //
-            // var t2 = Task.Run(async () =>
-            // {
-            //     foreach (var item in Enumerable.Range(1,2000))
-            //     {
-            //         await bus2.PublishAsync(new UserEnableEvent
-            //         {
-            //             Email = $"正常{item}@gmail.com"
-            //         });
-            //         await Task.Delay(500);
-            //     }
-            // });
-            await Task.WhenAll(t1);
+            await Task.Delay(800);
+            
+            //var t1 = Task.Run(async () =>
+            //{
+            //    foreach (var item in Enumerable.Range(1,100))
+            //    {
+            //        await bus.PublishAsync(new ChatMessageIntegrationEvent("a","b","ccc")
+            //        {
+            //            RouteKey = "handle_msg"
+            //        });
+            //        await Task.Delay(800);
+            //    }
+            //});
+           
+            //await Task.WhenAll(t1);
             Console.ReadKey();
         }
     }
